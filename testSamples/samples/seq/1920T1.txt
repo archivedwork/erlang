@@ -1,0 +1,153 @@
+
+The link of the [documentation.](http://erlang.org/doc/man/)
+--------------------------------------------------------
+
+Task no. 0:
+===========
+
+Copy the following declaration form to your Erlang file and fill in the required data:
+
+~~~~
+%% <Name>
+%% <Neptun ID>
+%% <DDS, TEST1>
+%% <11.10.2019.>
+%% This solution was submitted and prepared by <Name, Neptun ID> for the DDS Retake Test Sequential.
+%% I declare that this solution is my own work.
+%% I have not copied or used third party solutions.
+%% I have not passed my solution to my classmates, neither  made it public.
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+~~~~
+
+
+
+Task no. 1: anagram/2
+=================================
+Given a list of words and a list of possible anagrams, select the correct sublist for each word:
+Eg. Given "listen" and "kile" and a list of candidates: "like", "enlist" , "google", "inlets", "banana" 
+
+the program should return a map that has listen and kile as keys:
+%[{"listen"=>["enlist","inlets"]},{"kile"=>["like"]}].
+
+%%%%%%%%%%%%#1  
+~~~
+anagrams(list(strings),list(strings)) -> map(string,list(strings))
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:anagrams(["hi","cloud"],["hic","could","loud"]).
+#{"cloud" => ["could"],"hi" => []}
+
+test:anagrams(["listen","kile"],["enlist" , "google", "inlets", "banana","like" ]).
+#{"kile" => ["like"],"listen" => ["enlist","inlets"]}
+
+test:anagrams(["hi","cloud"],["hic","could","clouds","clou","loud"]).
+#{"cloud" => ["could"],"hi" => []}
+
+~~~
+
+Task no. 2: every_other/3
+=================================
+Make a function that given two fuctions F and G and a list, applies the two functions alternatively to the elements in the list. 
+Eg. for f(x)=x+1 , g(x)= x*2    [1,2,3]->[2,4,4]
+%%%%%%%%%%%%#2  
+~~~
+every_other(fun(),fun(),list()) -> list()
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:every_other(fun(E)->E-1 end, fun(E)->E div 2 end, [1,2,3,4,5,6,7] ).      
+[0,1,2,2,4,3,6]
+
+test:every_other(fun lists:max/1,fun lists:min/1 , [[1,2,3,4],[3,4,5],[1,23,2]] ).
+[4,3,23]
+
+test:every_other(fun lists:max/1,fun lists:min/1 , [] ).                       
+[] 
+
+Task no. 3: farfallino/1 
+=================================
+
+The farfallino alphabet (in Italian alfabeto farfallino) is a language game used primarily in Italy, which can be regarded as an elementary form of substitution cipher
+
+The usual rules for farfallino alphabet are based on the substitution of each vowel with a 3 letter sequence where the vowel itself is repeated with an interceding f.
+E.g.
+casa → cafasafa
+lago → lafagofo
+
+%%%%%%%%%%%%#3  
+~~~
+farfallino(string()) -> string()
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test::farfallino("hello mama").
+"hefellofo mafamafa"
+
+test::farfallino(" ").         
+" "
+
+test:farfallino([$a,$i]).  
+"afaifi"
+
+Task no. 4: armstrong/1 
+=================================
+
+An Armstrong number is a number that is the sum of its own digits each raised to the power of the number of digits.
+
+For example:
+
+9 is an Armstrong number, because 9 = 9^1 = 9
+10 is not an Armstrong number, because 10 != 1^2 + 0^2 = 1
+153 is an Armstrong number, because: 153 = 1^3 + 5^3 + 3^3 = 1 + 125 + 27 = 153
+154 is not an Armstrong number, because: 154 != 1^3 + 5^3 + 4^3 = 1 + 125 + 64 = 190
+
+Make a function  count_and_digits/1 that at the same times cuts a number into a list of its digits (eg. 12 -> [1,2]) and keep the count of them. 
+You are not allowed to use length function, the counting has to be done while separating the number! 
+
+Than use it to make armstrong(N) that calculate wether or not a number is an armstrong number.
+
+%%%%%%%%%%%%#3  
+~~~
+count_and_digits(number())-> {number(),list(number)}
+
+armstrong(number())->boolean() 
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:count_and_digits(1234).
+{4,[1,2,3,4]}
+
+test:armstrong(153).
+true 
+
+test:armstrong(196).
+false
+
+test:armstrong(370).
+true
+
+test:armstrong(1741725).
+true
+
+

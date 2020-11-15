@@ -1,0 +1,27 @@
+%% Task 1.
+%% Define a function pfilter/2 that takes a predicate function F and a list as arguments. The functions (let us call it as the parent process) spawns as many processes as the number of elemnts of the list. Each process evaluates the predicate function on an element of the list and answers to its parent process whether the result of function F is true or false. The parent process puts the element into the result list if function F evaluated to true.
+
+%% Do not use additional list traversing (filtering on the list of received elements) in the parent process. A single reverse is allowed if needed.'
+
+
+%test2:pfilter(fun erlang:is_atom/1, []) == []
+%test2:pfilter(fun erlang:is_atom/1, [1, apple, 13, pear]) == [apple,pear]
+%test2:pfilter(fun(X) -> X < 2 end, [1,0,1]) == [1,0,1]
+%test2:pfilter(fun(X) -> X < 2 end, [3,2]) == []
+%test2:pfilter(fun(X) -> X < 2 end, [3,1,2,3,4,1,3,1,0]) == [1,1,1,0]
+
+
+%% Task 2.
+%% Look into the following definition of the pipeline function. It takes a list of functions (Funs) and a list of values (Values) as an argument. It takes an element from the Values list and applies all the functions from Funs on the element after each other like a composition. For example: let Funs = [F, G, H] and List = [1,2], then the return value is [H(G(F(1))), H(G(F(2)))].  
+
+%% Your task is to implement the parallel equivalent of this function ppipeline/2 in the following way:
+%%  - spawn as many processes as the number of functions in the Funs list, send all the data from Values list to the first process (element by element and not as a whole list), and wait for all computed values arriving back from the last process (again element bz element and not as a single list).
+%%  - each spawned process waits for a data, evaluates its function and sends the result to the next function to evaluate
+%%  - after these stepes the process waits for the next message and do the same steps
+
+%% Task 3.
+
+%% Implement a mechanism to stop the started processes in Task 2.
+
+%% Task 4
+%% par filter becomes par partition function: the false element are sent to a garbage collector node that can show them if probed and that cleans itself if it receive nothing for 4 seconds

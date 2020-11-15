@@ -1,0 +1,104 @@
+
+The link of the [documentation.](http://erlang.org/doc/man/)
+--------------------------------------------------------
+
+The following tasks can be solved simply using recursion. You can use the functions from the lists module or list comprehension, but in that case you will get 50% of the points ( thus you have to solve minimum two tasks to get a passing grade(2)).    
+
+Task no. 0:
+===========
+
+Copy the following declaration to your Erlang file and fill in the required data:
+
+~~~~
+%% <Name>
+%% <Neptun ID>
+%% <DDS, TEST1 retake>
+%% <11.04.2018>
+%% This solution was submitted and prepared by <Name, Neptun ID> for the DDS Retake Test Sequential.
+%% I declare that this solution is my own work.
+%% I have not copied or used third party solutions.
+%% I have not passed my solution to my classmates, neither  made it public.
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+~~~~
+
+
+Task no. 1: 
+=================================
+Create a function partition(L,D) that divides a list L in parts of defined size D (last partition may be smaller than D).
+
+%%%%%%%%%%%%#1  
+~~~
+partition(list(),integer()) -> list(list())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+> re1:partition([1,2,3,4,5,6,7,8],2)== [[1,2],[3,4],[5,6],[7,8]].
+> re1:partition([1,2,3,4,5,6,7],2)== [[1,2],[3,4],[5,6],[7]].
+> re1:partition([1,2,3,4,5,6,7],4)== [[1,2,3,4],[5,6,7]].
+~~~
+
+
+Task no. 2: 
+=================================
+Create a function combine(Funs,Value,Combine) that has three arguments: a list of functions (Funs), to apply to a single integer value (Value), and a function Combine that takes two elements at a time from the results of the functions, to combine all of them in a single value.
+
+%%%%%%%%%%%%#2
+~~~
+combine(list(fun()),integer(),fun()) -> integer()
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+>re1:combine([fun(X)->X*2 end, fun(X)->X rem 2 end],fun(X,Y)-> X+Y end,1)== 3.
+>re1:combine([fun(X)->X*2 end, fun(X)->X rem 2 end],fun(X,Y)-> X-2*Y end,4)== 8.
+~~~
+
+
+Task no. 3: 
+=================================
+Create a function inse(L,E), that returns all the possible insertions of an Element to a List.
+
+%%%%%%%%%%%%#3  
+~~~
+inse(list(),integer()) -> list()
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+**The order of the element in the result is not important**
+~~~
+>re1:inse([1,2,3],4)==[[4,1,2,3],[1,4,2,3],[1,2,4,3],[1,2,3,4]].
+>re1:inse([1,3],2)==[[2,1,3],[1,2,3],[1,3,2]].
+~~~
+
+
+Task no. 4: 
+=================================
+Create a function perm(L), that returns all the possible permutations for a list. (Use the function inse/2 of Task 3. )
+
+%%%%%%%%%%%%#4  
+~~~
+perm(list()) -> list(list())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+>re1:perm("abc")==["abc","bac","bca","cba","cab","acb"].
+>re1:perm([1,2])==[[1,2],[2,1]].
+>re1:perm([3,2,6])==[[3,2,6],[2,3,6],[2,6,3],[6,2,3],[6,3,2],[3,6,2]].
+~~~

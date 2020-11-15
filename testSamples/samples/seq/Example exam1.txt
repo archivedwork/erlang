@@ -1,0 +1,272 @@
+Melinda Toth <tothmelinda@caesar.elte.hu>
+Mon 2017-11-06 11:20
+To: Reale Anna
+More actions
+Dear Anna,
+
+I was just about to send it :) Zsolt was here and ask me about the tutoring and that reminded me :)
+
+Melinda
+
+Task no. 0:
+===========
+
+Copy the following declaration form to your Erlang file and fill in the required data:
+
+~~~~
+%% <Name>
+%% <Neptun ID>
+%% <DDS, TEST1>
+%% <26.10.2017.>
+%% This solution was submitted and prepared by <Name, Neptun ID> for the DDS Retake Test Sequential.
+%% I declare that this solution is my own work.
+%% I have not copied or used third party solutions.
+%% I have not passed my solution to my classmates, neither  made it public.
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+~~~~
+
+The link of the [documentation.](http://erlang.org/doc/man/)
+--------------------------------------------------------
+
+Task no. 1: first_n_abundant_nums
+=================================
+
+Define the function `first_n_abundant_nums/1` that returns the first `N` abundant numbers in increasing order, where `N` is the argument of the function.
+
+Description from the Wikipedia: *"In number theory, an abundant number or excessive number is a number for which the sum of its proper divisors is greater than the number itself. The integer `12` is the first abundant number. Its proper divisors are `1`, `2`, `3`, `4` and `6` for a total of `16`. The amount by which the sum exceeds the number is the abundance. The number `12` has an abundance of `4`, for example."*
+
+~~~
+first_n_abundant_nums(integer()) -> list(integer())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:first_n_abundant_nums(5) == [12,18,20,24,30]
+test:first_n_abundant_nums(20) == [12,18,20,24,30,36,40,42,48,54,56,60,66,70,72,78,80,84,88,90]
+~~~
+
+Task no. 2: bin_to_decimal
+==========================
+
+Define the function named `bin_to_decimal/1` that converts a binary to the corresponding decimal number.
+The input of the function is a list of bits (list of values `0` and `1`) and the output is a decimal number.
+
+For example, for the list `[1,0,1,0,1,0]` the output is the value `42`.
+
+The list `[1,0,1,0,1,0]` stands for $101010_2$, that is interpreted as $1*2^5 + 0*2^4  + 1*2^3 + 0*2^2 + 1*2^1 + 0*2^0 == 42$
+
+**IMPORTANT:** The usage of function `list_to_integer/2` is forbidden in the implementation!
+
+~~~
+bin_to_decimal(list(0|1)) -> integer()
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:bin_to_decimal([]) == 0
+test:bin_to_decimal([0]) == 0
+test:bin_to_decimal([0,0,0,0,0]) == 0
+test:bin_to_decimal([1,0,0,0,0]) == 16
+test:bin_to_decimal([1,0,1,0,1,0]) == 42
+test:bin_to_decimal([1,1,1,1,1,1,1,1,1,0,1,0,0]) == 8180
+~~~
+
+Task no. 3: Increasing numbers
+==============================
+
+Define a function `numbers_from_n/2` that takes a digit `N` and an
+integer `M` as arguments. The function returns a sequence of numbers
+in increasing order that are made only from the given digit `N`. In
+other words, the return value is composed of the replicas of digit `N`
+as a list like: `[N, NN, NNN, NNNN, ...]`. The length of the sequence is `M`.
+
+An example, where `M` is bound to `3` and `N` to `1`, the function
+returns a list like: `[1, 11, 111]`
+
+~~~
+numbers_from_n(N::integer(), M::integer()) -> Result::list(integer())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:numbers_from_n(0,1) == [0]
+test:numbers_from_n(1,0) == []
+test:numbers_from_n(1,1) == [1]
+test:numbers_from_n(1,2) == [1,11]
+test:numbers_from_n(1,4) == [1,11,111,1111]
+test:numbers_from_n(2,4) == [2,22,222,2222]
+test:numbers_from_n(0,2) == [0,0]
+~~~
+
+Task no. 4: until
+=================
+
+Define the higher-order function `until/3`. The function iteratively applies an operation on a value until a given condition holds for the computed value.
+
+The function takes three arguments:
+
+ 1. The first argument is a predicate (a function with arity 1), that returns either true or false.
+ 
+ 2. The second argument is a function with only one argument. This function is repeatable/iterable, that is the domain and the range/codomain are of the same type.
+
+ 3. The value that has to be iteratively transformed with the given function to fulfill the given condition.
+
+~~~
+until(Predicate::fun(any() -> boolean()), Operation::(any() -> any()) -> Result::any())
+~~~
+
+Test cases:Task no. 0:
+===========
+
+Copy the following declaration form to your Erlang file and fill in the required data:
+
+~~~~
+%% <Name>
+%% <Neptun ID>
+%% <DDS, TEST1>
+%% <26.10.2017.>
+%% This solution was submitted and prepared by <Name, Neptun ID> for the DDS Retake Test Sequential.
+%% I declare that this solution is my own work.
+%% I have not copied or used third party solutions.
+%% I have not passed my solution to my classmates, neither  made it public.
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+~~~~
+
+The link of the [documentation.](http://erlang.org/doc/man/)
+--------------------------------------------------------
+
+Task no. 1: first_n_abundant_nums
+=================================
+
+Define the function `first_n_abundant_nums/1` that returns the first `N` abundant numbers in increasing order, where `N` is the argument of the function.
+
+Description from the Wikipedia: *"In number theory, an abundant number or excessive number is a number for which the sum of its proper divisors is greater than the number itself. The integer `12` is the first abundant number. Its proper divisors are `1`, `2`, `3`, `4` and `6` for a total of `16`. The amount by which the sum exceeds the number is the abundance. The number `12` has an abundance of `4`, for example."*
+
+~~~
+first_n_abundant_nums(integer()) -> list(integer())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:first_n_abundant_nums(5) == [12,18,20,24,30]
+test:first_n_abundant_nums(20) == [12,18,20,24,30,36,40,42,48,54,56,60,66,70,72,78,80,84,88,90]
+~~~
+
+Task no. 2: bin_to_decimal
+==========================
+
+Define the function named `bin_to_decimal/1` that converts a binary to the corresponding decimal number.
+The input of the function is a list of bits (list of values `0` and `1`) and the output is a decimal number.
+
+For example, for the list `[1,0,1,0,1,0]` the output is the value `42`.
+
+The list `[1,0,1,0,1,0]` stands for $101010_2$, that is interpreted as $1*2^5 + 0*2^4  + 1*2^3 + 0*2^2 + 1*2^1 + 0*2^0 == 42$
+
+**IMPORTANT:** The usage of function `list_to_integer/2` is forbidden in the implementation!
+
+~~~
+bin_to_decimal(list(0|1)) -> integer()
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:bin_to_decimal([]) == 0
+test:bin_to_decimal([0]) == 0
+test:bin_to_decimal([0,0,0,0,0]) == 0
+test:bin_to_decimal([1,0,0,0,0]) == 16
+test:bin_to_decimal([1,0,1,0,1,0]) == 42
+test:bin_to_decimal([1,1,1,1,1,1,1,1,1,0,1,0,0]) == 8180
+~~~
+
+Task no. 3: Increasing numbers
+==============================
+
+Define a function `numbers_from_n/2` that takes a digit `N` and an
+integer `M` as arguments. The function returns a sequence of numbers
+in increasing order that are made only from the given digit `N`. In
+other words, the return value is composed of the replicas of digit `N`
+as a list like: `[N, NN, NNN, NNNN, ...]`. The length of the sequence is `M`.
+
+An example, where `M` is bound to `3` and `N` to `1`, the function
+returns a list like: `[1, 11, 111]`
+
+~~~
+numbers_from_n(N::integer(), M::integer()) -> Result::list(integer())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:numbers_from_n(0,1) == [0]
+test:numbers_from_n(1,0) == []
+test:numbers_from_n(1,1) == [1]
+test:numbers_from_n(1,2) == [1,11]
+test:numbers_from_n(1,4) == [1,11,111,1111]
+test:numbers_from_n(2,4) == [2,22,222,2222]
+test:numbers_from_n(0,2) == [0,0]
+~~~
+
+Task no. 4: until
+=================
+
+Define the higher-order function `until/3`. The function iteratively applies an operation on a value until a given condition holds for the computed value.
+
+The function takes three arguments:
+
+ 1. The first argument is a predicate (a function with arity 1), that returns either true or false.
+ 
+ 2. The second argument is a function with only one argument. This function is repeatable/iterable, that is the domain and the range/codomain are of the same type.
+
+ 3. The value that has to be iteratively transformed with the given function to fulfill the given condition.
+
+~~~
+until(Predicate::fun(any() -> boolean()), Operation::(any() -> any()) -> Result::any())
+~~~
+
+Test cases:
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:until(fun(_) -> true end, fun(X) -> X + 4 end, 1) == 1
+test:until(fun(E) -> E > 10 end, fun(E) -> E + 1 end, 1) == 11
+test:until(fun(E) -> E > 10000 end, fun(E) -> E * 2 end, 1) == 16384
+test:until(fun([X|Xs]) -> X == 1 end, fun([X|Xs]) -> Xs end, [0,0,9,2,3,1,2,4,3]) == [1,2,4,3]
+~~~
+
+
+
+-----------
+
+**Do not forget to change the name of the module!**
+
+~~~
+test:until(fun(_) -> true end, fun(X) -> X + 4 end, 1) == 1
+test:until(fun(E) -> E > 10 end, fun(E) -> E + 1 end, 1) == 11
+test:until(fun(E) -> E > 10000 end, fun(E) -> E * 2 end, 1) == 16384
+test:until(fun([X|Xs]) -> X == 1 end, fun([X|Xs]) -> Xs end, [0,0,9,2,3,1,2,4,3]) == [1,2,4,3]
+~~~

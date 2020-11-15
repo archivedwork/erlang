@@ -1,0 +1,24 @@
+% make a parallel version of a find, given a Text and a Word, returning the index of the first occurrence of Word in Text. 
+
+  % make a function rdt_chunk that takes a list, divide it in parts of size N , but having a buffer of length B, so that every next chunks starts
+  % repeating the last B character of the previous. (*tip* have a look at lists:split)
+  % eg  L= [12,2,33,4,25,6] , N=3, Buff=1   
+  %    Res=[[12,2,33],[33,4,25],[25,6]]
+  %                          |___|     |___|
+  %
+  % togheter with each chunk, store it's starting index with respect to L: eg. 
+  % L=    [12,     2,    33,     4,      25,   6]
+  %        |       |      |      |       |      | 
+  % i:     1       2      3      4       5      6
+  %         |              \              \
+  %Res=   [{1,[12,2,33]},  {3,[33,4,25]},{5,[25,6]}] 
+
+  %par_find  takes the size of the chunks NC, the Word to find and the Text.  Using World-1 as buffer it calculates the chunks and spawns as many workers.
+  % than it waits for the results receiving them in the same order they were sent. As soon as a valid Index vaue arrives it terminates and returns it. 
+  %(Leftover messages will be unused in the mailbox)    
+
+  %workers take a Chunk, the Word to find and The Index of the Chunk. Using string:find the worker decide wheter the word is in is chunk. 
+  % Using the Index and the result of string:find worker computes the original Index of the result.
+  %Worker should send the result (either false or the original Index) back to par_find.      
+
+%% 

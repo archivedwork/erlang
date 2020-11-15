@@ -1,0 +1,134 @@
+Erlang/OTP 22 [erts-10.5] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1]
+
+Eshell V10.5  (abort with ^G)
+1> cd("C:/Users/eannrea/OneDrive - Ericsson AB/Erla/2020").
+c:/Users/eannrea/OneDrive - Ericsson AB/Erla/2020
+ok
+2> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+{ok,fourth}
+3> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+{ok,fourth}
+4> fourth:subsum([1,2,3]).
+[1,3,6]
+5> c(fourth).             
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:6: Warning: variable 'V' is unused
+{ok,fourth}
+6> fourth:cval(1,[1,2,3]). 
+1
+7> fourth:cval(1,[1,2,3,1]).
+2
+8> c(fourth).               
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:6: Warning: variable 'V' is unused
+fourth.erl:10: Warning: this clause cannot match because a previous clause at line 9 always matches
+fourth.erl:11: Warning: this clause cannot match because a previous clause at line 9 always matches
+{ok,fourth}
+9> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:6: Warning: variable 'V' is unused
+{ok,fourth}
+10> fourth:cval(3,[1,2,3,1]).
+3
+11> fourth:cval(1,[1,2,3,1]).
+ok
+12> fourth:cval(2,[1,2,3,1]).
+** exception error: an error occurred when evaluating an arithmetic expression
+     in function  fourth:cval/2 (fourth.erl, line 9)
+13> c(fourth).               
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:6: Warning: variable 'V' is unused
+{ok,fourth}
+14> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+{ok,fourth}
+15> fourth:count([1,2,3,1,3,2,4]).
+[{1,1},{2,2},{3,3},{1,1},{3,2},{2,1},{4,1}]
+16> F=fun(A)-> A*2 end. 
+#Fun<erl_eval.7.126501267>
+17> 
+17> F(3). 
+6
+18> c(fourth).                    
+fourth.erl:27: syntax error before: '['
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+error
+19> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+{ok,fourth}
+20> fourth:count([1,2,3,1,3,2,4]).
+[{1,1},{2,1},{3,1},{4,1}]
+21> c(fourth).                    
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+{ok,fourth}
+22> fourth:count([1,2,3,1,3,2,4]).
+[{1,2},{2,2},{3,2},{4,1}]
+23> c(fourth).                    
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+{ok,fourth}
+24> fourth:count([1,2,3,1,3,2,4]).
+[{1,2},{2,2},{3,2},{1,1},{3,1},{2,1},{4,1}]
+25> A=12.
+12
+26> F2= fun(A)->A/2 end.          
+#Fun<erl_eval.7.126501267>
+27> F2(6).              
+3.0
+28> F3= fun(E)->E*A end.
+#Fun<erl_eval.7.126501267>
+29> F3(3).              
+36
+30> c(fourth).                    
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:23: Warning: variable 'NT' is unused
+{ok,fourth}
+31> fourth:del(1,[2,3,1,4,1,5],2).
+** exception error: undefined function fourth:del/3
+32> c(fourth).                    
+fourth.erl:24: syntax error before: 'end'
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+error
+33> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:23: Warning: variable 'NT' is unused
+{ok,fourth}
+34> fourth:del(1,[2,3,1,4,1,5],2).
+[2,3,4,5]
+35> c(fourth).                    
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:23: Warning: variable 'NT' is unused
+fourth.erl:45: Warning: this clause cannot match because a previous clause at line 44 always matches
+{ok,fourth}
+36> c(fourth).
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:23: Warning: variable 'NT' is unused
+{ok,fourth}
+37> fourth:applyF(2).
+2
+38> fourth:applyF([2,3,4]).
+[2,3,4]
+39> fourth:applyF("ciao"). 
+"ciao"
+40> c(fourth).                    
+fourth.erl:2: Warning: export_all flag enabled - all functions will be exported
+fourth.erl:23: Warning: variable 'NT' is unused
+{ok,fourth}
+41> fourth:appLy(3,F3).   
+36
+42> F4= fun(_)-> true end. 
+#Fun<erl_eval.7.126501267>
+43> 
+43> fourth:appLy(3,F4).    
+true
+44> fourth:appLy(3,fun(E)-> E div 2 end).
+1
+45> fourth:appLy(8,fun(E)-> E div 2 end).
+4
+46> fourth:applyF([2,3,4]).              
+[2,3,4]
+47> fourth:applyF([2]).    
+4
+48> fourth:applyF([2,5]).
+[2,5]
