@@ -1,0 +1,4 @@
+Questions to ask
+- how to get next pid and send message to it ?   
+
+- in concurrent seive ,  returns all the previously stored Results, plus Tail and terminates

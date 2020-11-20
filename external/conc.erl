@@ -4,7 +4,7 @@
 
 % clock
 start(Time, Fun) ->
-    register(clock, spawn(?MODULE, tick, [])).   % or use spawn(fun() -> tick(Time, Fun))
+    register(clock, spawn(?MODULE, tick, [])).   % or use spawn(fun() -> tick(Time, Fun) end) or spawn_link() 
 
 
 stop() ->
@@ -31,7 +31,8 @@ mystart() ->
    %Pid ! "hi hi".
 
    Pid = spawn(?MODULE, loop, []),
-   register(testp, Pid).
+   register(testp, Pid),
+   call("HI").
 
 
 

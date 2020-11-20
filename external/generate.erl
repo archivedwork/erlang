@@ -4,24 +4,23 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 15. Nov 2020 14:46
+%%% Created : 17. Nov 2020 23:48
 %%%-------------------------------------------------------------------
--module(parallel_map).
+-module(generate).
 -author("mo").
 
 %% API
 -compile(export_all).
 
-
-pmap(Fun, List) ->
-  Pids = lists:map(fun(Elem) -> spawn(?MODULE, apply, [self(), Fun, Elem]) end, List),
+pmap(Fun) ->
+  Pids = lists:map(fun(Elem) -> spawn(?MODULE, apply, [self(), Fun, Elem]) end, lists:seq(1,10)),
   io:format("PIDS= ~p~n", [Pids]),
   lists:map(fun(Pid) ->
     receive
       {Pid, Result} -> Result
     end
-  end
-  , Pids).
+            end
+    , Pids).
 
 
 
