@@ -46,7 +46,7 @@ helper([HP|HPids], [HNext|NPids]) ->
 worker() ->
     receive
         {workthis, Job} -> worker(Job)
-    after 1000 -> something_wrong
+    after 2000 -> hey_something_went_wrong
     end.
 
 
@@ -60,13 +60,13 @@ worker(Fun) ->
             main ! Result
         %worker(Fun)   % means save previous value / Pid 
     
-    after 1000 -> something_wrong
+    after 2000 -> hey_something_went_wrong
     end.
 
 
 
 % kill all processes
-kill([]) -> all_processes_dead;
+kill([]) -> all_processes_are_dead;
 kill([P|Pids]) ->
     io:format("process ~p dead ~p ~n", [P, exit(P,dead)]),
     %or 
@@ -76,13 +76,14 @@ kill([P|Pids]) ->
 
 
 
-reset() ->
+
+restart() ->
     process_flag(trap_exit, true),
-    Pid = spawn_link(?MODULE, worker,[]),
+    Pid = spawn_link(?MODULE, worker,[]),    % link worker with every restart
     main ! {workthis,Pid},
     receive
         {'EXIT', Pid, Reason} ->
             io:format("the worker stopped because of ~p~n", [Reason]),
-            reset();
+            restart();
         quit -> dead
     end.

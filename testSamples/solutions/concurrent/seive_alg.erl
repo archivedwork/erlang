@@ -2,20 +2,20 @@
 -compile(export_all).
 
 
-start() ->
-  Self = self(),
-  Pid = fun() -> spawn(?MODULE, loop, []) end,
-  lists:foreach(Pid, lists:seq(1,10)).
-  %register(main, Pid).
+
+create_ring(W) ->
+    register(main, self()),
+    Processes = lists:map(fun(_) -> spawn(?MODULE, worker, []) end, lists:seq(1,W)),
+    io:format("Processes are: ~p~n", [Processes]),
+    main ! {something, hi}.
 
 
-loop() ->
-  receive
-    {next, Result} ->
-      Result,
-      loop();
 
-    {ends, Tail} ->
-      Tail,
-      ok
-  end.
+
+
+
+worker() ->
+    %  receive
+    %      {something, Job} ->
+            io:format("I worker process ~p ~n", [self()]).
+    %end.
