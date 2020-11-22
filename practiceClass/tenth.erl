@@ -29,8 +29,11 @@ start(W,J)-> %init trapexit  State  spawn workers
 	%lists:foldl( fun(Pi,[NP|Acc])-> Pi! {nextis,NP}, Acc   end  ,LNext,AllP).
 %helper([HP|Pids],[HN|NPids])-> HP !{next,Pids}, helper(Pids,NPids).
 
-send(ReP,J)-> lists:foldl( 
-	fun(Job,[{P,R}|Acc])-> P!{workthis,Job}, Acc++[{P,R}]   end  ,ReP,J).
+send(ReP,J)-> lists:foldl(
+	fun(Job,[{P,R}|Acc])-> 
+		P!{workthis,Job}, 
+	    Acc++[{P,R}]   
+	end  ,ReP,J).
 
 %sendandrec(Pids,[],[{J,P,_}|JR])-> 
 %	receive

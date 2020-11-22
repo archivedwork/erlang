@@ -77,13 +77,31 @@ kill([P|Pids]) ->
 
 
 
-restart() ->
-    process_flag(trap_exit, true),
-    Pid = spawn_link(?MODULE, worker,[]),    % link worker with every restart
-    main ! {workthis,Pid},
+reset() ->
+    process_flag(trap_exit, true),  % set trap_exit to true to receive messages with Reason 
+    Pid = spawn_link(?MODULE, worker,[]),    % link worker with every reset/restart
+    main ! {workthis,Pid},    % send {workthis, Pid} with linked Pid to main rigestered process
     receive
         {'EXIT', Pid, Reason} ->
             io:format("the worker stopped because of ~p~n", [Reason]),
-            restart();
+            reset();
+
+        {'DOWN', Pid, Reason} ->
+            io:format("the worker stopped because of ~p~n", [Reason]),
+            reset();
         quit -> dead
     end.
+
+
+
+
+
+receiver(Results) ->
+    receive
+        {res, Res} -> receiver([Res|Results]);
+        {'DOWN', Ref, }
+    
+    after 2000 -> timeout
+
+    end.
+
