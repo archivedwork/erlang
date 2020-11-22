@@ -82,12 +82,8 @@ reset() ->
     Pid = spawn_link(?MODULE, worker,[]),    % link worker with every reset/restart
     main ! {workthis,Pid},    % send {workthis, Pid} with linked Pid to main rigestered process
     receive
-        {'EXIT', Pid, Reason} ->
-            io:format("the worker stopped because of ~p~n", [Reason]),
-            reset();
-
         {'DOWN', Pid, Reason} ->
-            io:format("the worker stopped because of ~p~n", [Reason]),
+            io:format("the worker ~p stopped because of ~p~n", [Pid,Reason]),
             reset();
         quit -> dead
     end.

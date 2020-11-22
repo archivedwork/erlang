@@ -13,13 +13,16 @@ cook(PizzaType) ->
 
 
 
-
 pizzeria(OrdersList) ->
     register(client, self()),
     receive
         {order, ClientPid, Pizza} ->
-            spawn_monitor(?MODULE, cook, [Pizza]);
-        %{what_takes_so_long, ClientPid} -> 
+           {Ref, ClienPid} = spawn_monitor(?MODULE, cook, [Pizza]),
+           OrderList = {Ref, ClientPid},
+
+        {'DOWN', order, }
+        {what_takes_so_long, ClientPid} -> 
+
         close -> 
             colse
     end.
