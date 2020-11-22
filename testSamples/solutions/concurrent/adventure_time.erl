@@ -1,11 +1,13 @@
 %%%-------------------------------------------------------------------
-%%% @author MO
+%%% @author MO - TBRUEJ
 %%% @copyright (C) 2020, <ELTE>
 %%% @doc
 %%%
 %%% @end
 %%% Created : 15. Nov 2020 17:15
 %%% Updated : 21. Nov 2020 23:14
+%%% Last Updated : 22. Nov 2020 21:47
+%%% 
 %%%-------------------------------------------------------------------
 %%%%%%%%%%%%%%%%%% solution to adventure time %%%%%%%%%%%%%%%%
 
@@ -44,8 +46,10 @@ begin_adventure() ->
 
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% solution to pipeline (process ring) %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %-module(pipeline).
 
 %-compile(export_all).
@@ -61,12 +65,12 @@ create_ring(N) ->
     register(main, self()),
     Processes = lists:map(fun(_) -> spawn(?MODULE, pipe, [main])end, lists:seq(1,N)),
     io:format("Processes are: ~p~n", [Processes]),
-    sendNext(Processes),
-    [HH|_] = Processes,
-    pipe(HH),
-    %PP = pipe(HH), % HH is next process, apply it to pipe
-    %PP ! quit. 
-    %timer:sleep(2000),
+    
+    Processes ! {forward, 3}, 
+   
+    NPid = sendNext(Processes),
+    pipe(NPid),
+    
     kill(Processes).
 
 
@@ -109,5 +113,62 @@ kill([P|Pids]) ->
 
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%% solution to Pizzeira %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-module(pizza).
+%-compile(export_all).
+
+
+
+% accept two types only margherita and calzone. 
+cook(PizzaType) ->
+    case PizzaType of
+        margherita ->
+            timer:sleep(500);
+        calzone ->
+            timer:sleep(600)
+    end.
+
+
+
+pizzeria(OrdersList) ->
+    register(client, self()),
+    receive
+        {order, Client, Pizza} ->
+           {Ref, Client} = spawn_monitor(?MODULE, cook, [Pizza]),
+           OrderList = [{Ref, Client}];
+
+        {'DOWN', order, Ref,  _Client, Pizza} ->
+            io:format("Pizza delivered~p~n");
+
+        {what_takes_so_long, _Client, Pizza} 
+                -> {cooking, Pizza};
+
+        close -> 
+            colse
+    end.
+ 
+
+open() ->
+    Order = [],
+    PizzaPid = spawn(?MODULE, pizzeria, [Order]),
+    register(pizzeria, PizzaPid),
+    true.
+
+
+
+close() ->
+    pizzeria ! close.
+
+
+order(PizzaOrder) ->
+    Client = self(),
+    pizzeria ! {order, Client, PizzaOrder}.
+
+
+where_is_my_pizza() ->
+        Client = self(),
+        pizzeria ! {what_takes_so_long, Client, 'margherita'}.
+
+

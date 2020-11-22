@@ -16,12 +16,15 @@ cook(PizzaType) ->
 pizzeria(OrdersList) ->
     register(client, self()),
     receive
-        {order, ClientPid, Pizza} ->
-           {Ref, ClienPid} = spawn_monitor(?MODULE, cook, [Pizza]),
-           OrderList = {Ref, ClientPid},
+        {order, Client, Pizza} ->
+           {Ref, Client} = spawn_monitor(?MODULE, cook, [Pizza]),
+           OrderList = [{Ref, Client}];
 
-        {'DOWN', order, }
-        {what_takes_so_long, ClientPid} -> 
+        {'DOWN', order, Ref,  _Client, Pizza} ->
+            io:format("Pizza delivered~p~n");
+
+        {what_takes_so_long, _Client, Pizza} 
+                -> {cooking, Pizza};
 
         close -> 
             colse
@@ -41,10 +44,12 @@ close() ->
 
 
 order(PizzaOrder) ->
-    ClientPid = self(),
-    pizzeria ! PizzaOrder.
+    Client = self(),
+    pizzeria ! {order, Client, PizzaOrder}.
 
 
 where_is_my_pizza() ->
-        Client = whereis(client).
+        Client = self(),
+        pizzeria ! {what_takes_so_long, Client, 'margherita'}.
+
 
