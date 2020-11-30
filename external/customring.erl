@@ -35,7 +35,7 @@ sendNext(AllProcesses=[P|Pids]) ->
 
 helper([], _) -> empty_helper;
 helper([HP|HPids], [HNext|NPids]) ->
-    HP ! {next, HNext},
+    HP ! {next, HNext},    %% change this one to send message
     helper(HPids, NPids).
 
 

@@ -1,50 +1,51 @@
--module(conc_sieve).
+-module(seive).
 -compile([export_all]).
 
-	%% {check, N, [1,2,....N]} 
-	%% {next,Result} stores the new result, then loop again  
-  %% {ends,Tail}  returns all the previously stored Results, plus Tail and terminates
+start() ->
+    init(5,5).
 
-init(N,W)-> spawn(?MODULE,startring,[N, W]).  
+init(N,W)-> spawn(?MODULE,create_ring,[N, W]).  
 	
-startring(N, W)->
+create_ring(N, W)->
 	register(main,self()),
-  Lpid = lists:foldl(fun(_,Next)->spawn(?MODULE,worker,[Next]) end, main, lists:seq(1,W)), 
-  io:format(" start ring PID ~p ~n",[Lpid]),
-  Lpid ! {check, N,  lists:seq(2,N)},
-  worker(Lpid),
-  rec([]),
-  io:format("Main is ~p ~n",[self()]).
+  Pid = lists:foldl(fun(_,Next)->spawn(?MODULE,worker,[Next]) end, main, lists:seq(1,W)), 
+  io:format("Ring Pid : ~p ~n",[Pid]),
+  Pid ! {check, N,  lists:seq(2,N)},
+  worker(Pid),
+  rec([]).
 
 worker(NextPid)->
-	io:format("The worker process is ~p~n",[self()]),  
+	io:format("Worker process is ~p~n",[self()]),  
 	receive
-		{check, N, L} -> workeraction(N, NextPid,L)
-	after 10000 -> something_wrong_worker
+		{check, N, L} -> loop(N, NextPid,L)
+	after 10000 -> timeout
 	end.
 
-workeraction(N, NextPid, Result=[EH|ET]) when  N >= (EH * EH)->
+loop(N, NextPid, Result=[H|T]) when  N >= (H * H)->
 	Main = whereis(main),
-  Res = lists:filter(fun(E)-> E rem EH /= 0 end, ET),
-  io:format("sending ~p to Main ~p ~n",[EH,Main]),
-  Main ! {next, EH}, NextPid ! {check,  N, Res}, 
+  Res = lists:filter(fun(E)-> E rem H /= 0 end, T),
+  io:format("sending ~p to Main ~p ~n",[H,Main]),
+  Main ! {next, H}, NextPid ! {check,  N, Res}, 
   worker(NextPid);
-workeraction(N, NextPid, L)-> 	Main = whereis(main), Main ! {ends, L}.
+loop(N, NextPid, L)-> 	Main = whereis(main), Main ! {ends, L}.
 
 
-rec(Acc)->
+rec(Rec)->
 	receive
 		{ends,Tail} -> 
-    io:format("received the end worker: ~p ~p ~n", [Acc, Tail]),
-    erlang:display(lists:reverse(Acc) ++ Tail);
+    io:format("End worker: ~p ~p ~n", [Rec, Tail]),
+    erlang:display(lists:reverse(Rec) ++ Tail);
 		{next,Res} ->	
-    io:format("received : ~p ~n", [[Res|Acc]]),
-    rec([Res|Acc])
-	after 1000 -> something_wrong_rec
+    io:format("Received : ~p ~n", [[Res|Rec]]),
+    rec([Res|Rec])
+	after 1000 -> timeout
 	end.
 
 
-  %kill process
-  
-  kill(Pid) ->
-    exit(Pid, dead).
+% kill all processes
+kill([]) -> all_processes_are_dead;
+kill([P|Pids]) ->
+    io:format("process ~p dead ~p ~n", [P, exit(P,dead)]),
+    %or 
+    % P ! dead,
+    kill(Pids).
