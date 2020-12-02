@@ -55,5 +55,22 @@ end.
 
 
 %% backend
-handlebed(TravelerId, Bed, DiceRoll) ->
-    ok.
+handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->
+    case DiceRoll of 
+        1 -> 
+            if Bed == free ->
+                not_allowed_to_pass;
+            true -> not_granted
+            end;
+        5 -> 
+            if Bed == free ->
+                pass
+            end;
+        _ ->
+            pass
+        end.
+
+
+diceroll(N) when N > 6  -> 0; 
+diceroll(N) when N =< 6 ->
+    rand:uniform(N).
