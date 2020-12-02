@@ -5,14 +5,31 @@
 % {inn, inn@localhost}
 
 create_goblins(N) when N < 10 ->
-    GB = spawn('inn@localhost',?MODULE, goblin, []),
-    global:register_name(mygoblin, GB),
-    global:whereis_name(mygoblin).
-    %[P|Processes]  = lists:map(fun(_) -> spawn(?MODULE, goblin, []) end, lists:seq(1,N)),
+    %GB = spawn('inn@localhost',?MODULE, goblin, []),
+    %global:register_name(mygoblin, GB),
+    %global:whereis_name(mygoblin).
+    [P|Processes]  = lists:map(fun(_) -> spawn(inn@localhost,?MODULE, goblin, []) end, lists:seq(1,N)).
     %global:register_name(mygoblin, self()),
     
     %io:format("goblins Pids are ~p~n", [[P|Processes]]).
 
+
+create(N) ->
+    Spawn = fun(X) ->
+        XBin = integer_to_binary(X),
+        %Name = randchar(5),
+        Name = binary_to_atom(<<"goblin, /XBin" >>)
+        Pid = spawn(?MODULE, goblin, []),
+        io:format("Pid is : ~p~n", [Pid]),
+        global:register_name(Name, Pid) end,
+        [Spawn(X) || X <- lists:seq(1,N)],
+        io:format("Registered goblins are: ~p~n", [global:registered_names()]).
+
+
+randchar(N) -> randchar(N, []).
+
+randchar(0, Acc) -> Acc;
+randchar(N, Acc) -> randchar(N - 1, [random:uniform(26) + 96 | Acc]).
 
 % {traveller, traveller@localhost}
 
