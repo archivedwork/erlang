@@ -4,32 +4,27 @@
 % create a node called inn and run the goblins there.
 % {inn, inn@localhost}
 
+create_goblins(N) when N >= 10 -> exit;
 create_goblins(N) when N < 10 ->
-    %GB = spawn('inn@localhost',?MODULE, goblin, []),
-    %global:register_name(mygoblin, GB),
-    %global:whereis_name(mygoblin).
-    [P|Processes]  = lists:map(fun(_) -> spawn(inn@localhost,?MODULE, goblin, []) end, lists:seq(1,N)).
-    %global:register_name(mygoblin, self()),
-    
-    %io:format("goblins Pids are ~p~n", [[P|Processes]]).
-
-
-create(N) ->
     Spawn = fun(X) ->
-        XBin = integer_to_binary(X),
-        %Name = randchar(5),
-        Name = binary_to_atom(<<"goblin, /XBin" >>)
-        Pid = spawn(?MODULE, goblin, []),
-        io:format("Pid is : ~p~n", [Pid]),
+        Name = randGoblinNames(6),
+        Pid = spawn(inn@localhost, fun() -> receive _A -> goblin() end end),
+        io:format("Pid is: ~p~n", [Pid]),
         global:register_name(Name, Pid) end,
         [Spawn(X) || X <- lists:seq(1,N)],
-        io:format("Registered goblins are: ~p~n", [global:registered_names()]).
+        io:format("registered goblins are ~p~n", [global:registered_names()]).
+  
 
 
-randchar(N) -> randchar(N, []).
+% randGoblinNames(N)  where N is a number for word long
+randGoblinNames(N) -> randGoblinNames(N, []).
 
-randchar(0, Acc) -> Acc;
-randchar(N, Acc) -> randchar(N - 1, [random:uniform(26) + 96 | Acc]).
+randGoblinNames(0, Acc) -> Acc;
+randGoblinNames(N, Acc) -> randGoblinNames(N - 1, [random:uniform(26) + 96 | Acc]).
+
+
+
+
 
 % {traveller, traveller@localhost}
 
@@ -43,11 +38,10 @@ traveler() ->
 %%%%%%%%%%%%%%%%% Inn Adventure Implementation %%%%%%%%%%%%%%%%
 inn_adventure() ->
     global:registered_names(),
-    io:format("global registered mygoblin : ~p~n", [global:whereis_name(mygoblin)]).
+    io:format("global registered mygoblin : ~p~n", [global:registered_names()]).
 
     %GoblinNumbers = (length(Processes) / 2) + 1,
     %io:format("Goblins Numbers: ~p~n", [GoblinNumbers]).
-
 
 goblin() ->
 
