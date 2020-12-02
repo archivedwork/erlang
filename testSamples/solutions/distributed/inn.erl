@@ -5,14 +5,31 @@
 % {inn, inn@localhost}
 
 create_goblins(N) when N < 10 ->
-    global:register_name(create_goblin, spawn(fun() -> goblin() end)).
-    %P = whereis(create_goblin),
-    %io:format("goblins Pids are ~p~n", [P]).
+    GB = spawn('inn@localhost',?MODULE, goblin, []),
+    global:register_name(mygoblin, GB),
+    global:whereis_name(mygoblin).
+    %[P|Processes]  = lists:map(fun(_) -> spawn(?MODULE, goblin, []) end, lists:seq(1,N)),
+    %global:register_name(mygoblin, self()),
+    
+    %io:format("goblins Pids are ~p~n", [[P|Processes]]).
 
 
+% {traveller, traveller@localhost}
 
+%%%%%%%%%%%%%%%% Traveler Implementation %%%%%%%%%%%%%%%%%%%%%%%
 traveler() ->
-    ok.
+    spawn('traveler@localhost', ?MODULE, inn_adventure, []).
+
+
+
+
+%%%%%%%%%%%%%%%%% Inn Adventure Implementation %%%%%%%%%%%%%%%%
+inn_adventure() ->
+    global:registered_names(),
+    io:format("global registered mygoblin : ~p~n", [global:whereis_name(mygoblin)]).
+
+    %GoblinNumbers = (length(Processes) / 2) + 1,
+    %io:format("Goblins Numbers: ~p~n", [GoblinNumbers]).
 
 % If he get a request to pass he will decide whether to let the traveler go (handlebed/3 ).
 
