@@ -6,12 +6,16 @@
 
 create_goblins(N) when N >= 10 -> exit;
 create_goblins(N) when N < 10 ->
-    Spawn = fun(X) ->
-        Name = randGoblinNames(6),
-        Pid = spawn(inn@localhost, fun() -> receive _A -> goblin() end end),
-        io:format("Pid is: ~p~n", [Pid]),
-        global:register_name(Name, Pid) end,
+     Spawn =  fun(X) ->
+                    Name = randGoblinNames(6),
+                    %Pid = spawn(inn@localhost, fun() -> receive _A -> goblin() end end),
+                    Pid = spawn(inn@localhost, fun() -> goblin() end),
+                    io:format("Pid is: ~p~n", [Pid]),
+                    global:register_name(Name, Pid)
+                end,
+                
         [Spawn(X) || X <- lists:seq(1,N)],
+       % end
         io:format("registered goblins are ~p~n", [global:registered_names()]).
   
 
@@ -20,7 +24,7 @@ create_goblins(N) when N < 10 ->
 randGoblinNames(N) -> randGoblinNames(N, []).
 
 randGoblinNames(0, Acc) -> Acc;
-randGoblinNames(N, Acc) -> randGoblinNames(N - 1, [random:uniform(26) + 96 | Acc]).
+randGoblinNames(N, Acc) -> randGoblinNames(N - 1, [rand:uniform(26) + 96 | Acc]).
 
 
 
@@ -35,10 +39,13 @@ traveler() ->
 
 
 
+
 %%%%%%%%%%%%%%%%% Inn Adventure Implementation %%%%%%%%%%%%%%%%
 inn_adventure() ->
-    global:registered_names(),
-    io:format("global registered mygoblin : ~p~n", [global:registered_names()]).
+    L = length(global:registered_names()),
+    DINSTINCT = L / 2 + 1,
+    % GoblinID =  index of distinct if Distinct = 3 then bring goblin id in index 3
+    io:format("global registered mygoblin : ~p~n and length of them are ~p~n and Distinct is ~p~n", [global:registered_names(), L, DINSTINCT]).
 
     %GoblinNumbers = (length(Processes) / 2) + 1,
     %io:format("Goblins Numbers: ~p~n", [GoblinNumbers]).
@@ -52,7 +59,7 @@ goblin() ->
 
         {leaving_bed, TravelerId} ->
             Bed = free 
-    after 2000 -> timeout
+    %after 2000 -> timeout
 end.
 
 
