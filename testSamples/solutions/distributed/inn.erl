@@ -101,14 +101,3 @@ gameOverHelper([P|Pids]) ->
     io:format("goblin ~p with pid of ~p is dead ~n", [P, exit(global:whereis_name(P), dead)]),
     gameOverHelper(Pids).
 
-
-
-
-
-
-
-
-
-
-
-
