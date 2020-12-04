@@ -45,7 +45,7 @@ inn_adventure() ->
     L = length(global:registered_names()),
     DINSTINCT = L / 2 + 1,
     % GoblinID =  index of distinct if Distinct = 3 then bring goblin id in index 3
-    io:format("global registered mygoblin : ~p~n and length of them are ~p~n and Distinct is ~p~n", [global:registered_names(), L, DINSTINCT]).
+    io:format("global registered goblins are : ~p~n and length of them are ~p~n and Distinct is ~p~n", [global:registered_names(), L, DINSTINCT]).
 
     %GoblinNumbers = (length(Processes) / 2) + 1,
     %io:format("Goblins Numbers: ~p~n", [GoblinNumbers]).
@@ -98,6 +98,6 @@ gameover() ->
 
 gameOverHelper([]) -> all_goblins_are_dead;
 gameOverHelper([P|Pids]) ->
-    io:format("goblin ~p with pid of ~p is dead ~n", [P, exit(global:whereis_name(P), dead)]),
+    io:format("goblin ~p with pid of ~p is dead ~p~n", [P, global:whereis_name(P), exit(global:whereis_name(P), dead)]),
     gameOverHelper(Pids).
 
