@@ -6,7 +6,7 @@
 
 create_goblins(N) when N >= 10 -> exit;
 create_goblins(N) when N < 10 ->
-     Spawn =  fun(X) ->
+     Spawn =  fun(_X) ->
                     Name = randGoblinNames(6),
                     %Pid = spawn(inn@localhost, fun() -> receive _A -> goblin() end end),
                     Pid = spawn(inn@localhost, fun() -> goblin() end),
@@ -52,13 +52,13 @@ inn_adventure() ->
 
 goblin() ->
 
-    Bed = free,
+    _Bed = free,
     receive
-        {on_bed, TravelerId} ->
-            Bed = on_bed;
+        {on_bed, _TravelerId} ->
+            on_bed;
 
-        {leaving_bed, TravelerId} ->
-            Bed = free 
+        {leaving_bed, _TravelerId} ->
+           free 
     %after 2000 -> timeout
 end.
 
@@ -66,7 +66,7 @@ end.
 
 
 %% backend
-handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->
+handlebed(_TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->
     case DiceRoll of 
         1 -> 
             if Bed == free ->
@@ -86,3 +86,29 @@ handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->
 diceroll(N) when N > 6  -> 0; 
 diceroll(N) when N =< 6 ->
     rand:uniform(N).
+
+
+%%%%%%%%%%%%%%%%%%%% Game Over Implementation %%%%%%%%%%%%%%%%%%%%%%%
+% it only kills all goblins  
+% it should kill sentinel monitor as well
+gameover() ->
+    LstOfRegGoblins = global:registered_names(),
+    gameOverHelper(LstOfRegGoblins).
+
+
+gameOverHelper([]) -> all_goblins_are_dead;
+gameOverHelper([P|Pids]) ->
+    io:format("goblin ~p with pid of ~p is dead ~n", [P, exit(global:whereis_name(P), dead)]),
+    gameOverHelper(Pids).
+
+
+
+
+
+
+
+
+
+
+
+
