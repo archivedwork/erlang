@@ -29,7 +29,6 @@ randGoblinNames(N, Acc) -> randGoblinNames(N - 1, [rand:uniform(26) + 96 | Acc])
 
 
 
-
 % {traveller, traveller@localhost}
 
 %%%%%%%%%%%%%%%% Traveler Implementation %%%%%%%%%%%%%%%%%%%%%%%
@@ -89,8 +88,22 @@ diceroll(N) when N =< 6 ->
 
 
 %%%%%%%%%%%%%%%%%%%% Game Over Implementation %%%%%%%%%%%%%%%%%%%%%%%
-% it only kills all goblins  
-% it should kill sentinel monitor as well
+% it only kills all goblins and its monitors
+sentinel() ->
+    GetRegisteredGoblins = global:registered_names(),
+    sentinel_helper(GetRegisteredGoblins).
+
+
+sentinel_helper([]) -> all_monitored_goblins_are_dead;
+sentinel_helper([P|Pids]) ->
+    MRef = erlang:monitor(process, global:whereis_name(P)),
+    io:format("goblin ~p with pid of ~p and Ref of ~p is killed ~p~n", [P, global:whereis_name(P), MRef, exit(global:whereis_name(P), kill)]),
+    %erlang:flush(),
+    sentinel_helper(Pids).    
+    
+
+
+
 gameover() ->
     LstOfRegGoblins = global:registered_names(),
     gameOverHelper(LstOfRegGoblins).
