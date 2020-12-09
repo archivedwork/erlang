@@ -41,43 +41,79 @@ traveler() ->
 
 %%%%%%%%%%%%%%%%% Inn Adventure Implementation %%%%%%%%%%%%%%%%
 inn_adventure() ->
-    L = length(global:registered_names()),
-    DINSTINCT = L / 2 + 1,
-    % GoblinID =  index of distinct if Distinct = 3 then bring goblin id in index 3
-    io:format("global registered goblins are : ~p~n and length of them are ~p~n and Distinct is ~p~n", [global:registered_names(), L, DINSTINCT]).
+    N = length(global:registered_names()),
+    DINSTINCT = (N div 2 + 1),
+    GoblinsList = global:registered_names(),
+    % GoblinID ==  index of distinct if Distinct = 3 then bring goblin id in index 3 then get the id
+    Goblin = lists:nth(DINSTINCT, GoblinsList),
+    GoblinId = global:whereis_name(Goblin),
+    %io:format("global registered goblins are : ~p~n and length of them are ~p~n and Distinct is ~p so the Goblin is ~p and GoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
+    % send allow message to goblin and usse_bed
+    %global:send(inn@localhost, {granted, GoblinId}).
+    receive 
+    after 3000 -> inn_adventure()
+    end.
 
-    %GoblinNumbers = (length(Processes) / 2) + 1,
-    %io:format("Goblins Numbers: ~p~n", [GoblinNumbers]).
+
+%%case Gr of
+%    granted ->
+%        % send {granted, GoblinId} to goblin 
+%        receive
+
+
+%        end;
+
+%    grunted ->
+%        receive
+%        after 3000 -> inn_adventure()
+%        end.
+
+
+
 
 goblin() ->
 
-    _Bed = free,
-    receive
-        {on_bed, _TravelerId} ->
-            on_bed;
+    Bed = free,
+    receive 
+        {granted, TravelerId} ->
+            handlebed(TravelerId, Bed, diceroll(6)),
+                receive
+                    {on_bed, TravelerId} ->
+                            on_bed;
+                    {leaving_bed, TravelerId} ->
+                            free 
+                end
+    end.
 
-        {leaving_bed, _TravelerId} ->
-           free 
-    %after 2000 -> timeout
-end.
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%% backend %%%%%%%%%%%%%%%%%%%%%%%%
 
-%% backend
-handlebed(_TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->
+% how to call handlebed/3 from terminal
+% > Pid = pid(0,120,0).
+% > c(inn).
+% > inn:create_goblins(4).
+% > inn:handlebed(Pid, on_bed, inn:diceroll(6)).
+% {grunt,<0.120.0>} 
+
+handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here is the inn_adventure function Pid
     case DiceRoll of 
         1 -> 
             if Bed == free ->
-                not_allowed_to_pass;
-            true -> not_granted
+                TravelerId ! {grunt, TravelerId}   % not allowed to pass
             end;
         5 -> 
             if Bed == free ->
-                pass
+                TravelerId ! {grant, TravelerId}
             end;
         _ ->
-            pass
+            if Bed =/= free ->
+                if TravelerId =/= self() ->    % self() here means a different Pid   (Bed is not free but a different Pid)
+                    TravelerId ! {grunt, TravelerId};
+                    true -> ok
+                end
+            end
         end.
 
 
@@ -87,8 +123,10 @@ diceroll(N) when N =< 6 ->
     rand:uniform(N).
 
 
+
+
 %%%%%%%%%%%%%%%%%%%% Game Over Implementation %%%%%%%%%%%%%%%%%%%%%%%
-% it only kills all goblins and its monitors
+% kills all goblins and its monitors
 sentinel() ->
     GetRegisteredGoblins = global:registered_names(),
     sentinel_helper(GetRegisteredGoblins).
@@ -103,7 +141,7 @@ sentinel_helper([P|Pids]) ->
     
 
 
-
+% kill all the goblins
 gameover() ->
     LstOfRegGoblins = global:registered_names(),
     gameOverHelper(LstOfRegGoblins).
