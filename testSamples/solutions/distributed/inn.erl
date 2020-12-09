@@ -1,6 +1,15 @@
 -module(inn).
 -compile(export_all).
 
+send() ->
+        global:send(traveler@localhost,{granted, global:whereis_name(gid)}),
+			receive
+				logged ->  ok;
+				notpossible-> 'server is full'
+ 			after 1000-> serverout	
+			end.
+
+
 % create a node called inn and run the goblins there.
 % {inn, inn@localhost}
 
@@ -45,16 +54,32 @@ inn_adventure() ->
     DINSTINCT = (N div 2 + 1),
     GoblinsList = global:registered_names(),
     % GoblinID ==  index of distinct if Distinct = 3 then bring goblin id in index 3 then get the id
+    
     Goblin = lists:nth(DINSTINCT, GoblinsList),
     GoblinId = global:whereis_name(Goblin),
-    %io:format("global registered goblins are : ~p~n and length of them are ~p~n and Distinct is ~p so the Goblin is ~p and GoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
+    global:register_name(gid, GoblinId),
+    io:format("global registered goblins are ~p~nlength of them are ~p~nDistinct is ~p~nthe Goblin is ~p~nGoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
     % send allow message to goblin and usse_bed
-    %global:send(inn@localhost, {granted, GoblinId}).
-    receive 
-    after 3000 -> inn_adventure()
+    
+    if DINSTINCT rem 2 == 0 -> 
+        io:format("~p~n",[{granted, GoblinId}]),
+        receive
+            {on_bed, GoblinId} -> im_on_bed
+        after 3000 -> timeout
+        end;
+        
+        
+        true -> 
+            io:format("~p~n",[{grunted, GoblinId}]),
+            receive
+            after 300 -> inn_adventure()
+            end
     end.
 
+    
 
+
+        
 %%case Gr of
 %    granted ->
 %        % send {granted, GoblinId} to goblin 
@@ -72,17 +97,17 @@ inn_adventure() ->
 
 
 goblin() ->
-
+    global:register_name(gg, self()),
     Bed = free,
     receive 
         {granted, TravelerId} ->
-            handlebed(TravelerId, Bed, diceroll(6)),
-                receive
-                    {on_bed, TravelerId} ->
-                            on_bed;
-                    {leaving_bed, TravelerId} ->
-                            free 
-                end
+            handlebed(TravelerId, Bed, diceroll(6))
+                %receive
+                %    {on_bed, TravelerId} ->
+                %            on_bed;
+                %    {leaving_bed, TravelerId} ->
+                %            free 
+                %end
     end.
 
 
@@ -95,24 +120,29 @@ goblin() ->
 % > c(inn).
 % > inn:create_goblins(4).
 % > inn:handlebed(Pid, on_bed, inn:diceroll(6)).
-% {grunt,<0.120.0>} 
+% {grunt,<0.120.0>}
+
 
 handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here is the inn_adventure function Pid
+    self(),
     case DiceRoll of 
-        1 -> 
+        1 ->
             if Bed == free ->
-                TravelerId ! {grunt, TravelerId}   % not allowed to pass
+                TravelerId ! {grunt, TravelerId};   % not allowed to pass
+                true -> TravelerId ! {grunt, TravelerId} % bed_not_free % handlebed(TravelerId, Bed, diceroll(6))
             end;
-        5 -> 
+        5 ->
             if Bed == free ->
-                TravelerId ! {grant, TravelerId}
+                TravelerId ! {grant, TravelerId};
+            true -> TravelerId ! {grant, TravelerId} 
             end;
         _ ->
             if Bed =/= free ->
                 if TravelerId =/= self() ->    % self() here means a different Pid   (Bed is not free but a different Pid)
                     TravelerId ! {grunt, TravelerId};
-                    true -> ok
-                end
+                    true -> is_equal
+                end;
+            true -> Bed
             end
         end.
 
