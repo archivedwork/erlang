@@ -98,15 +98,14 @@ goblin() ->
     Bed = free,
     receive 
         {use_bed, TravelerId} ->
-            lists:map(fun(Name) -> 
-                io:format("inn: I am Goblin ~p received ~p~n", [Name, {use_bed, TravelerId}]) end, GoblinsList), goblin(),
-            handlebed(TravelerId, Bed, diceroll(6))
-                % receive
-                %    {on_bed, TravelerId} ->
-                %            on_bed;
-                %    {leaving_bed, TravelerId} ->
-                %            free 
-                % end
+                io:format("inn: Goblin received ~p~n", [{use_bed, TravelerId}]), goblin(),
+            handlebed(TravelerId, Bed, diceroll(6)),
+                receive
+                   {on_bed, TravelerId} ->
+                           {on_bed, TravelerId};
+                   {leaving_bed, TravelerId} ->
+                           {free, TravelerId} 
+                end
     end.
 
 %net_adm:ping('inn@localhost').
@@ -123,7 +122,6 @@ goblin() ->
 
 
 handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here is the inn_adventure function Pid
-    self(),
     case DiceRoll of 
         1 ->
             if Bed == free ->
