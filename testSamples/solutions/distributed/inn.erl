@@ -1,17 +1,12 @@
 -module(inn).
 -compile(export_all).
 
-send() ->
-        global:send(traveler@localhost,{granted, global:whereis_name(gid)}),
-			receive
-				logged ->  ok;
-				notpossible-> 'server is full'
- 			after 1000-> serverout	
-			end.
+
 
 
 % create a node called inn and run the goblins there.
 % {inn, inn@localhost}
+% this function is finished do not play with it 
 
 create_goblins(N) when N >= 10 -> exit;
 create_goblins(N) when N < 10 ->
@@ -24,9 +19,9 @@ create_goblins(N) when N < 10 ->
                 end,
                 
         [Spawn(X) || X <- lists:seq(1,N)],
-       % end
+
         io:format("registered goblins are ~p~n", [global:registered_names()]).
-  
+
 
 
 % randGoblinNames(N)  where N is a number for word long
@@ -42,7 +37,7 @@ randGoblinNames(N, Acc) -> randGoblinNames(N - 1, [rand:uniform(26) + 96 | Acc])
 
 %%%%%%%%%%%%%%%% Traveler Implementation %%%%%%%%%%%%%%%%%%%%%%%
 traveler() ->
-    spawn('traveler@localhost', ?MODULE, inn_adventure, []).
+    Traveller = spawn('traveler@localhost', ?MODULE, inn_adventure, []).
 
 
 
@@ -50,67 +45,71 @@ traveler() ->
 
 %%%%%%%%%%%%%%%%% Inn Adventure Implementation %%%%%%%%%%%%%%%%
 inn_adventure() ->
-    N = length(global:registered_names()),
-    DINSTINCT = (N div 2 + 1),
-    GoblinsList = global:registered_names(),
+    
+    %GoblinsList = global:registered_names(),
     % GoblinID ==  index of distinct if Distinct = 3 then bring goblin id in index 3 then get the id
     
-    Goblin = lists:nth(DINSTINCT, GoblinsList),
-    GoblinId = global:whereis_name(Goblin),
-    global:register_name(gid, GoblinId),
-    io:format("global registered goblins are ~p~nlength of them are ~p~nDistinct is ~p~nthe Goblin is ~p~nGoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
+     %Goblin = lists:nth(DINSTINCT, GoblinsList),
+    % GoblinId = global:whereis_name(Goblin),
+    % global:register_name(gid, GoblinId), % already registered no need for register again
+    % io:format("global registered goblins are ~p~nlength of them are ~p~nDistinct is ~p~nthe Goblin is ~p~nGoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
     % send allow message to goblin and usse_bed
+
+    GoblinsList = global:registered_names(),
+    TravellerId = self(),
+    Message =  {use_bed, TravellerId},
+
+     N = length(global:registered_names()),
+    DINSTINCT = (N div 2 + 1),
+
+     %Goblin = lists:nth(DINSTINCT, GoblinsList),
+    % GoblinId = global:whereis_name(Goblin),
+
+    %global:send(Goblin, Message).
+   lists:map(
+        fun(Name) -> 
+        global:send(Name, Message),
+        io:format("traveller: Goblin ~p received ~p~n", [Name, Message])
+    end, GoblinsList).
+
+   
     
-    if DINSTINCT rem 2 == 0 -> 
-        io:format("~p~n",[{granted, GoblinId}]),
-        receive
-            {on_bed, GoblinId} -> im_on_bed
-        after 3000 -> timeout
-        end;
+    % if DINSTINCT rem 2 == 0 -> 
+    %     io:format("~p~n",[{granted, GoblinId}]),
+    %     receive
+    %         {on_bed, GoblinId} -> im_on_bed
+    %     after 3000 -> timeout
+    %     end;
         
         
-        true -> 
-            io:format("~p~n",[{grunted, GoblinId}]),
-            receive
-            after 300 -> inn_adventure()
-            end
-    end.
+    %     true -> 
+    %         io:format("~p~n",[{grunted, GoblinId}]),
+    %         receive
+    %         after 300 -> inn_adventure()
+    %         end
+    % end.
 
     
-
-
-        
-%%case Gr of
-%    granted ->
-%        % send {granted, GoblinId} to goblin 
-%        receive
-
-
-%        end;
-
-%    grunted ->
-%        receive
-%        after 3000 -> inn_adventure()
-%        end.
-
 
 
 
 goblin() ->
-    global:register_name(gg, self()),
+    GoblinsList = global:registered_names(),
     Bed = free,
     receive 
-        {granted, TravelerId} ->
+        {use_bed, TravelerId} ->
+            lists:map(fun(Name) -> 
+                io:format("inn: I am Goblin ~p received ~p~n", [Name, {use_bed, TravelerId}]) end, GoblinsList), goblin(),
             handlebed(TravelerId, Bed, diceroll(6))
-                %receive
+                % receive
                 %    {on_bed, TravelerId} ->
                 %            on_bed;
                 %    {leaving_bed, TravelerId} ->
                 %            free 
-                %end
+                % end
     end.
 
-
+%net_adm:ping('inn@localhost').
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% backend %%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,6 +154,9 @@ diceroll(N) when N =< 6 ->
 
 
 
+
+
+
 %%%%%%%%%%%%%%%%%%%% Game Over Implementation %%%%%%%%%%%%%%%%%%%%%%%
 % kills all goblins and its monitors
 sentinel() ->
@@ -182,3 +184,36 @@ gameOverHelper([P|Pids]) ->
     io:format("goblin ~p with pid of ~p is dead ~p~n", [P, global:whereis_name(P), exit(global:whereis_name(P), dead)]),
     gameOverHelper(Pids).
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% instructions to execute 
+% inn@localhost> net_adm:ping('traveler@localhost').
+% inn@localhost> net_adm:ping('traveler1@localhost').
+% inn@localhost> c(inn).
+% inn@localhost> inn:create_goblins(6).
+% inn@localhost>
+
+
+
+
+
+
+% traveler@localhost>inn:traveler().
+
+
+
+% traveler1@localhost> inn:traveler().
