@@ -69,7 +69,7 @@ inn_adventure() ->
    lists:map(
         fun(Name) -> 
         global:send(Name, Message),
-        io:format("traveller: Goblin ~p received ~p~n", [Name, Message])
+        io:format("traveller: Send ~p to Goblin ~p ~n", [Message, Name])
     end, GoblinsList).
 
    
