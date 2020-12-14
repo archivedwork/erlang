@@ -55,42 +55,48 @@ inn_adventure() ->
     % io:format("global registered goblins are ~p~nlength of them are ~p~nDistinct is ~p~nthe Goblin is ~p~nGoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
     % send allow message to goblin and usse_bed
 
+    % Goblin = lists:nth(DINSTINCT, GoblinsList),
+    % GoblinId = global:whereis_name(Goblin),
+
+    % global:send(Goblin, Message).
+
     GoblinsList = global:registered_names(),
     TravellerId = self(),
     Message =  {use_bed, TravellerId},
 
-     N = length(global:registered_names()),
+    N = length(global:registered_names()),
     DINSTINCT = (N div 2 + 1),
 
-     %Goblin = lists:nth(DINSTINCT, GoblinsList),
-    % GoblinId = global:whereis_name(Goblin),
-
-    %global:send(Goblin, Message).
+    
    lists:map(
         fun(Name) -> 
         global:send(Name, Message),
         io:format("traveller: Send ~p to Goblin ~p ~n", [Message, Name])
-    end, GoblinsList).
+    end, GoblinsList),
 
    
-    
-    % if DINSTINCT rem 2 == 0 -> 
-    %     io:format("~p~n",[{granted, GoblinId}]),
-    %     receive
-    %         {on_bed, GoblinId} -> im_on_bed
-    %     after 3000 -> timeout
-    %     end;
-        
-        
-    %     true -> 
-    %         io:format("~p~n",[{grunted, GoblinId}]),
-    %         receive
-    %         after 300 -> inn_adventure()
-    %         end
-    % end.
+    receive 
+        {grant, TravelerId} -> 
+            io:format("inn: received ~p~n", {grant, TravelerId}),
+            if DINSTINCT rem 2 == 0 -> 
+                global:send(TravelerId, {on_bed, TravelerId}),
+                timer:sleep(5000),
+                global:send(TravelerId, {leaving_bed, TravelerId});
+                
+                
+                true -> 
+                    receive
+                    after 3000 -> inn_adventure()
+                    end
+            end;
 
-    
 
+        {grunt, TravelerId} -> 
+            io:format("inn: received ~p~n", {grunt, TravelerId})
+        after 2000 -> timeout
+    end.
+    
+    
 
 
 goblin() ->
@@ -98,14 +104,15 @@ goblin() ->
     Bed = free,
     receive 
         {use_bed, TravelerId} ->
-                io:format("inn: Goblin received ~p~n", [{use_bed, TravelerId}]), goblin(),
+                io:format("inn: Goblin received ~p~n", [{use_bed, TravelerId}]),
             handlebed(TravelerId, Bed, diceroll(6)),
-                receive
-                   {on_bed, TravelerId} ->
-                           {on_bed, TravelerId};
-                   {leaving_bed, TravelerId} ->
-                           {free, TravelerId} 
-                end
+            goblin()
+                % receive
+                %    {on_bed, TravelerId} ->
+                %            {on_bed, TravelerId};
+                %    {leaving_bed, TravelerId} ->
+                %            {free, TravelerId} 
+                % end
     end.
 
 %net_adm:ping('inn@localhost').
@@ -125,17 +132,21 @@ handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here i
     case DiceRoll of 
         1 ->
             if Bed == free ->
-                TravelerId ! {grunt, TravelerId};   % not allowed to pass
-                true -> TravelerId ! {grunt, TravelerId} % bed_not_free % handlebed(TravelerId, Bed, diceroll(6))
+                io:format("handlebed: sending ~p to goblinId ~p and Bed is ~p~n", [{grunt, TravelerId},TravelerId, Bed]), 
+                global:send(TravelerId, {grunt, TravelerId});
+                %TravelerId ! {grunt, TravelerId};   % not allowed to pass
+                true -> ok% TravelerId ! {grunt, TravelerId} % bed_not_free % handlebed(TravelerId, Bed, diceroll(6))
             end;
         5 ->
             if Bed == free ->
+                io:format("handlebed: sending ~p to goblinId ~p and Bed is ~p~n", [{grant, TravelerId},TravelerId, Bed]), 
                 TravelerId ! {grant, TravelerId};
             true -> TravelerId ! {grant, TravelerId} 
             end;
         _ ->
             if Bed =/= free ->
                 if TravelerId =/= self() ->    % self() here means a different Pid   (Bed is not free but a different Pid)
+                    io:format("handlebed: sending ~p to goblinId ~p and Bed is ~p~n", [{grunt, TravelerId},TravelerId, Bed]),
                     TravelerId ! {grunt, TravelerId};
                     true -> is_equal
                 end;
