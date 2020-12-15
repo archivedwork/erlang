@@ -2,12 +2,14 @@
 -compile(export_all).
 
 
-create_goblins() -> create_goblins(9).
+create_goblins() -> create_goblins(9). % fixed  number of goblins which is 10
 
 create_goblins(N) ->
-    Name = "goblin1", %% list of goblins and then use map
-    Pids = spawn(?MODULE, fun() -> goblin(free) end),
-    global:register_name(Name, self()).    
+
+    NameList = "Gob" ++ lists:seq(1,N),
+    NN = list_to_atom("stuu"), % list_to_atom    %% list of goblins and then use map
+io:format("gbnames ~p~n", [NN]),    % Pids = spawn(?MODULE, fun() -> goblin(free) end),
+    lists:map(fun(Name) -> global:register_name(Name, NameList)end).
 
 
 
