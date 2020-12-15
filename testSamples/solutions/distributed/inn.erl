@@ -6,12 +6,13 @@
 
 % create a node called inn and run the goblins there.
 % {inn, inn@localhost}
-% this function is finished do not play with it 
 
 create_goblins(N) when N >= 10 -> exit;
 create_goblins(N) when N < 10 ->
-     Spawn =  fun(_X) ->
-                    Name = randGoblinNames(6),
+     Spawn =  fun(X) ->
+                    %Name = randGoblinNames(6),       % or use Xbin and Name below 
+                    Xbin = erlang:integer_to_binary(X),
+                    Name = erlang:binary_to_atom(<<"im_gobbi_", Xbin/binary>>, utf8),
                     %Pid = spawn(inn@localhost, fun() -> receive _A -> goblin() end end),
                     Pid = spawn(inn@localhost, fun() -> goblin() end),
                     io:format("Pid is: ~p~n", [Pid]),
@@ -24,11 +25,11 @@ create_goblins(N) when N < 10 ->
 
 
 
-% randGoblinNames(N)  where N is a number for word long
+% randGoblinNames(N)  where N is a number for word long (word length)
 randGoblinNames(N) -> randGoblinNames(N, []).
 
 randGoblinNames(0, Acc) -> Acc;
-randGoblinNames(N, Acc) -> randGoblinNames(N - 1, [rand:uniform(26) + 96 | Acc]).
+randGoblinNames(N, Acc) -> randGoblinNames(N - 1, Acc ++ [rand:uniform(6) + 96]).
 
 
 
@@ -201,8 +202,15 @@ gameOverHelper([P|Pids]) ->
 
 
 
-
-
+% %%%%%%%%%%%%%%%% inn_adventure1(Patience) psudo code %%%%%%%%%%%
+inn_adventure1(0) -> gameover();
+inn_adventure1(Patience) ->
+    TravelerId = self(),
+    receive 
+        {use_bed, TravelerId} ->
+            inn_adventure1(Patience - 1)
+        
+        end.
 
 
 
