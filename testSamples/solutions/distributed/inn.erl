@@ -22,16 +22,16 @@
 
 
 %%%%%%%%%%%%%%% inn@localhost node %%%%%%%%%
-create_goblins() -> create_goblins_helper(3).
+create_goblins() -> create_goblins_helper(3). % change 0<N<10
 
 create_goblins_helper(N) when N >= 10 -> exit;
 create_goblins_helper(N) when N < 10 ->
      Spawn =  fun(X) ->
                     %Name = generateGoblinNames(6),       % or use Xbin and Name below 
                     Xbin = erlang:integer_to_binary(X),
-                    Name = erlang:binary_to_atom(<<"gobbi_", Xbin/binary>>, utf8),
-                    %Pid = spawn(inn@localhost, fun() -> receive _A -> goblin() end end),
-                    Pid = spawn(inn@localhost, fun() -> goblin(free) end),
+                    Name = erlang:binary_to_atom(<<"gobi_", Xbin/binary>>, utf8),
+                    Pid = spawn(inn@localhost, fun() -> receive _A -> goblin(free) end end),
+                    %Pid = spawn(inn@localhost, fun() -> goblin(free) end),
                     io:format("Pid is: ~p~n", [Pid]),
                     global:register_name(Name, Pid)
                 end,
@@ -52,11 +52,12 @@ generateGoblinNames(N, Acc) ->
 %%%%%%%%%%%%%%%% Traveler Implementation %%%%%%%%%%%%%%%%%%%%%%%
 %%%Modify the traveler so that after sleeping he will travel (wait for 3 seconds) and then he will start again his inn_adventure (make traveler/1 recursive) .
 
-traveler(0)  -> timeout;
-traveler(Time) ->
-        timer:sleep(Time-1),
-        spawn('traveler@localhost', ?MODULE, inn_adventure, []),
-        traveler(Time-1).
+%traveler(0)  -> timeout;
+traveler() ->
+        %timer:sleep(Time),
+        %spawn('traveler@localhost', ?MODULE, inn_adventure, []),
+        spawn(?MODULE, inn_adventure, []).
+       % traveler(Time-1).
 
 
 % net_adm:ping('traveler@localhost').
@@ -96,16 +97,17 @@ inn_adventure() ->
             io:format("traveler: grunt received~n"),
             inn_adventure()
 
-        after 2000 -> timeout
-    end.
+       % after 2000 -> timeout
+    end,
+    io:format("~n--------------------------------------------------~n").
     
 
-
+goblin(on_bed) -> stop;
 goblin(Bed) ->
     receive 
         stop -> io:format("terminated!");
         {use_bed, TravelerId} ->
-            io:format("Goblin: received ~p~n", [{use_bed, TravelerId}]),%goblin(Bed),
+            io:format("Goblin: received ~p~n", [{use_bed, TravelerId}]),
             handlebed(TravelerId, Bed, diceroll(6)),
                 receive
                    {on_bed, TravelerId} ->
@@ -114,8 +116,8 @@ goblin(Bed) ->
                    {leaving_bed, TravelerId} ->
                         io:format("leaving received~p ~n", [{leaving_bed, TravelerId}]),
                         TravelerId ! {leaving_bed, TravelerId}, goblin(Bed)
-                end%,
-               % goblin(Bed)
+                end,
+             goblin(Bed)
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% backend %%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,10 +146,11 @@ handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here i
                     TravelerId ! {grunt, TravelerId}  % any number == not allowed to pass
                 ,io:format("handlebed: sending grunt with Diceroll ~p~n",[DiceRoll])
                 end;
+                %handlebed(TravelerId, Bed, DiceRoll);
         false ->
             %global:send(TravelerId, {grunt, TravelerId}),
             TravelerId ! {grunt, TravelerId},
-            handlebed(TravelerId, free, 5)
+            handlebed(TravelerId, Bed, DiceRoll)
         end.
 
 % diceroll random number generation
