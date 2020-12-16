@@ -1,3 +1,22 @@
+%% <Mohammed Jamal Hadi>
+
+%% <TBRUEJ>
+
+%% <DDS, Mandatory Assignment>
+
+%% <16.12.2020.>
+
+%% This solution was submitted and prepared by <Mohammed Jamal Hadi, TBRUEJ> for the Distributed Mandatory Assignment.
+
+%% I declare that this solution is my own work.
+
+%% I have not copied or used third party solutions.
+
+%% I have not passed my solution to my classmates, neither  made it public.
+
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+
+
 -module(inn).
 -compile(export_all).
 
@@ -33,15 +52,11 @@ generateGoblinNames(N, Acc) ->
 %%%%%%%%%%%%%%%% Traveler Implementation %%%%%%%%%%%%%%%%%%%%%%%
 %%%Modify the traveler so that after sleeping he will travel (wait for 3 seconds) and then he will start again his inn_adventure (make traveler/1 recursive) .
 
-
+traveler(0)  -> timeout;
 traveler(Time) ->
-        timer:sleep(Time),
+        timer:sleep(Time-1),
         spawn('traveler@localhost', ?MODULE, inn_adventure, []),
-        traveler(Time),
-
-        receive
-            after 6000 -> timeout
-        end.
+        traveler(Time-1).
 
 
 % net_adm:ping('traveler@localhost').
@@ -91,7 +106,7 @@ goblin(Bed) ->
         stop -> io:format("terminated!");
         {use_bed, TravelerId} ->
             io:format("Goblin: received ~p~n", [{use_bed, TravelerId}]),%goblin(Bed),
-            handlebed(TravelerId, free, 5),
+            handlebed(TravelerId, Bed, diceroll(6)),
                 receive
                    {on_bed, TravelerId} ->
                        io:format("on_bed received~p ~n", [{on_bed, TravelerId}]),
@@ -118,16 +133,16 @@ handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here i
             case DiceRoll of 
                 1 ->
                     %global:send(TravelerId, {grunt, TravelerId});
-                    io:format("handlebed: 1 sending grunt ~n"),
+                    io:format("handlebed: sending grunt with Diceroll ~p~n",[DiceRoll]),
                     TravelerId ! {grunt, TravelerId}; % 1 == not allowed to pass
                 5 ->
                     %global:send(TravelerId, {grunt, TravelerId});
-                    io:format("handlebed: 5 sending grant ~n"),
+                    io:format("handlebed: sending grant with Diceroll ~p~n",[DiceRoll]),
                     TravelerId ! {grant, TravelerId}; % 5 == allowed to pass
                 _ -> 
                     %global:send(TravelerId, {grunt, TravelerId})
                     TravelerId ! {grunt, TravelerId}  % any number == not allowed to pass
-                ,io:format("handlebed: _ sending grunt ~n")
+                ,io:format("handlebed: sending grunt with Diceroll ~p~n",[DiceRoll])
                 end;
         false ->
             %global:send(TravelerId, {grunt, TravelerId}),
