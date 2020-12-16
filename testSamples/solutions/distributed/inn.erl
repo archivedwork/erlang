@@ -31,9 +31,18 @@ generateGoblinNames(N, Acc) ->
 
 
 %%%%%%%%%%%%%%%% Traveler Implementation %%%%%%%%%%%%%%%%%%%%%%%
-traveler() ->
-    spawn('traveler@localhost', ?MODULE, inn_adventure, []).
-    %spawn('traveler1@localhost', ?MODULE, inn_adventure, []).
+%%%Modify the traveler so that after sleeping he will travel (wait for 3 seconds) and then he will start again his inn_adventure (make traveler/1 recursive) .
+
+
+traveler(Time) ->
+        timer:sleep(Time),
+        spawn('traveler@localhost', ?MODULE, inn_adventure, []),
+        traveler(Time),
+
+        receive
+            after 6000 -> timeout
+        end.
+
 
 % net_adm:ping('traveler@localhost').
 %%%%%%%%%%%%%%%%% Inn Adventure Implementation %%%%%%%%%%%%%%%%
@@ -82,7 +91,7 @@ goblin(Bed) ->
         stop -> io:format("terminated!");
         {use_bed, TravelerId} ->
             io:format("Goblin: received ~p~n", [{use_bed, TravelerId}]),%goblin(Bed),
-            handlebed(TravelerId, free, diceroll(6)),
+            handlebed(TravelerId, free, 5),
                 receive
                    {on_bed, TravelerId} ->
                        io:format("on_bed received~p ~n", [{on_bed, TravelerId}]),
@@ -123,7 +132,7 @@ handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here i
         false ->
             %global:send(TravelerId, {grunt, TravelerId}),
             TravelerId ! {grunt, TravelerId},
-            handlebed(TravelerId, free, diceroll(6))
+            handlebed(TravelerId, free, 5)
         end.
 
 % diceroll random number generation
