@@ -104,17 +104,18 @@ goblin(Bed) ->
     receive 
         {use_bed, TravelerId} ->
             io:format("Goblin: received ~p~n", [{use_bed, TravelerId}]),
-            handlebed(TravelerId, Bed, diceroll(6)), % instead of 5 put diceroll(6)
-                receive
+            handlebed(TravelerId, Bed, diceroll(6)); % instead of 5 put diceroll(6)
+                %receive
                    {on_bed, TravelerId} ->
                        io:format("on_bed received~p ~n", [{on_bed, TravelerId}]),
                             TravelerId ! {on_bed, TravelerId},
-                            goblin(Bed);
+                            goblin(TravelerId); 
                    {leaving_bed, TravelerId} ->
                         io:format("leaving received~p ~n", [{leaving_bed, TravelerId}]),
                         TravelerId ! {leaving_bed, TravelerId}, 
-                       goblin(Bed)
-                end
+                       goblin(free) 
+                %end
+
     end,goblin(Bed).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%% backend %%%%%%%%%%%%%%%%%%%%%%%%
@@ -133,13 +134,13 @@ handlebed(TravelerId, Bed, DiceRoll) when DiceRoll =< 6 ->   % TravelerId here i
                 1 ->
                     io:format("handlebed: sending grunt with Diceroll ~p~n",[DiceRoll]),
                     TravelerId ! {grunt, TravelerId}; % 1 == not allowed to pass
-                5 ->
+                _ ->
                     io:format("handlebed: sending ~p with Diceroll ~p~n",[{grant, TravelerId},DiceRoll]),
                     %global:send(TravelerId, {grant, TravelerId});
-                    TravelerId ! {grant, TravelerId}; % 5 == allowed to pass
-                _ -> 
-                    TravelerId ! {grunt, TravelerId}  % any number == not allowed to pass
-                ,io:format("handlebed: sending grunt with Diceroll ~p~n",[DiceRoll])
+                    TravelerId ! {grant, TravelerId} % 5 == allowed to pass
+                %_ -> 
+                   % TravelerId ! {grunt, TravelerId}  % any number == not allowed to pass
+               % ,io:format("handlebed: sending grunt with Diceroll ~p~n",[DiceRoll])
                 end;
         false ->
             TravelerId ! {grunt, TravelerId}
