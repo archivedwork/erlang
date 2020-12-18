@@ -1,0 +1,232 @@
+Retake, Concurrent
+ 
+
+Task no. 0:
+===========
+Make sure to use only your repl (the same as you shared for SEQUENTIAL) and stay all the time in our call. 
+
+I will check the change file history, in case I suspect you did not write your solution.  So it is in your interest to do everything in repl and to not copy paste stuff.
+
+Create a new file called retC.erl, copy the following declaration form to your retC.erl file and fill in the required data:
+
+~~~~
+
+%% <Name>
+
+%% <Neptun ID>
+
+%% <DDS, RETAKE2>
+
+%% <07.12.2020.>
+
+%% This solution was submitted and prepared by <Name, Neptun ID> for the DDS Retake Concurrent.
+
+%% I declare that this solution is my own work.
+
+%% I have not copied or used third party solutions.
+
+%% I have not passed my solution to my classmates, neither  made it public.
+
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+
+~~~
+
+Task no. 1: Grade 2
+=================================
+A function factorial  (funfuct) of a function f() is calculated as  f(n) * funfact(f(n-1)) where funfact(f(0))= f(1).
+Make a parallel version of funfact:  the computation of f(n) in a process while an others does factf(f(n-1)) and so on. Instead of calculating n-1 you will implement a decrease function to reduce the value of n. There is a simplified example showed in the picture below. 
+
+pipe-1.png
+
+ 
+
+decreaser/1
+
+takes an element N:
+
+   returns N-1 if N is a number,
+    if N is a list removes the head and returns the list tail,
+   if  N is 0 or 1 or a list of one element,  the function returns a tuple containing  N =1 or the list of one element and the_end
+funfact(F,E,D)
+
+spawns a funfact/4 passing to it  the function F an element E the decreaser function D and the current process id Pid to initiate a process pipe, where each funfact spawns the next process in the pipeline.
+
+funfact/3 should be waiting for the result to come back to it from the first funfact/4 he spawned.
+
+
+funfact (F,E,D,PreviusPid )
+
+ 
+
+if the element is the tuple {the_end, E } it should send to PreviousPid the result of applying F on E
+otherwise:
+
+it calculates Result as function F applied to element E
+
+it spawns  a new funfact/4  saving its NPid  and passing to it F, element E decreased by Appling to it D, D and the current process id 
+it waits to receive back the NResult of the computation from NPid 
+it sends to PreviusPid  the product of Result and NResult
+~~~
+
+decreaser(list()) -> list()
+
+decreaser(number())-> number()
+
+funfact(fun(),element(),function())-> number()
+
+funfact(fun(),element(),function(), processid())-> number()
+
+~~~
+
+Test cases:
+
+
+>retC:funfact(fun(E)->E+1 end, 3, fun retC:decreaser/1).
+48
+>retC:funfact(fun lists:max/1,[5,4,6,7,3], fun retC:decreaser/1).
+21609
+>retC:funfact(fun lists:min/1,[5,4,6,7,3], fun retC:decreaser/1).
+729
+> retC:decreaser(1).                                                  
+{the_end,1}
+> retC:decreaser(0).
+{the_end,1}
+> retC:decreaser(3).
+2
+> retC:decreaser([1,2,3]).
+[2,3]
+> retC:decreaser([1]).    
+{the_end,[1]}
+
+Task no. 2: Grade 3
+=================================
+request(Pid,F,E)
+
+is a simple function that:
+
+create a unique reference Ref 
+sends  Ref to  Pid togheter with F E and D (the decreaser function)
+than waits for a result and returns it
+if something  goes wrong, after 10 second it returns oops.
+funfact_factory(N)
+
+spawn N workers looping and waiting.
+it returns the workers Pids so that we can use them later with request/3.
+if a worker dies with a reason that is not normal or work_done it should be respawned, have an helper function called fmonitor do that.
+worker/0
+
+any workers that receive a request {Ref,Pid,F,E,D}:
+
+will apply  funfact/4 to satisfy the request
+will return the result to the requesting Pid and terminate with work_done
+~~~
+
+worker() -> **exception exit : work_done
+
+funfact_factory(number())-> list(processid())
+
+request(processid(),fun(),element())->number()
+
+~~~
+
+Test cases:  %% my printing result may be different because of the parallel processing
+
+>retC:funfact_factory(3).
+MONITOR STARTED
+WORKER: <0.132.0> alive
+WORKER: <0.133.0> alive
+WORKER: <0.134.0> alive
+[<0.132.0>,<0.133.0>,<0.134.0>]
+>retC:request(<0.132.0>,fun(E)->E+1 end, 3).
+finally received 48
+WORKER: <0.132.0> alive
+ok
+>retC:request(<0.133.0>,fun(E)->bad end, 3).
+WORKER: <0.133.0> alive
+MONITOR: <0.133.0> is dead I created <0.164.0> 
+WORKER: <0.164.0> alive
+=ERROR REPORT====
+MONITOR STARTED
+
+Task no. 3: Grade 4 
+=================================
+worker(Jobs)
+
+Change the worker to loop forever and to handle multiple concurrent cients requests,
+always listening for more while handling them. Worker should keep track of the requests references and clients in a Jobs map. 
+Jobs should be stored in the worker as a map with Job represented as follows
+{Ref => {Pid,F,E,D}}
+results should be returned to the requesting Pid in the format {Ref,F,E,D,Result}
+
+~~~
+
+worker(maps())-> worker(maps())
+
+~~~
+
+Test cases:
+
+>retC:funfact_factory(3).                   
+MONITOR STARTED
+WORKER: <0.149.0> alive
+WORKER: <0.150.0> alive
+WORKER: <0.151.0> alive
+[<0.149.0>,<0.150.0>,<0.151.0>]
+>retC:request(<0.149.0>,fun(E)->E+1 end, 3).
+finally received {#Ref<0.3598836982.306446339.115785>,
+                  #Fun<erl_eval.7.126501267>,3,fun retC:decreaser/1,48} 
+WORKER: <0.149.0> alive
+ok
+WORKER: <0.149.0> alive
+Task no. 4: Grade 5 
+=================================
+Modify the worker to sleep for 1 second before acting.
+
+If the worker dies with normal exit print : MONITOR: normal and it's Pid.
+
+Otherwise  print the module function and arguments that caused the failure. 
+
+MONITOR: process Pid is dead because of Module:Function(Arguments)
+
+Recreate a new worker and print its Pid.
+
+Test cases:
+
+>retC:funfact_factory(3).                   
+MONITOR STARTED
+WORKER: <0.149.0> alive
+WORKER: <0.150.0> alive
+WORKER: <0.151.0> alive
+[<0.149.0>,<0.150.0>,<0.151.0>]
+
+>retC:request(<0.149.0>,fun(E)->E+1 end, 3).
+finally received {#Ref<0.3598836982.306446339.115785>,
+                  #Fun<erl_eval.7.126501267>,3,fun retC:decreaser/1,48} 
+WORKER: <0.149.0> alive
+ok
+WORKER: <0.149.0> alive>retC:request(<0.150.0>,fun(E)-> bad end, 3).
+WORKER: <0.150.0> alive
+MONITOR: <0.150.0> is dead I created <0.171.0> 
+WORKER: <0.171.0> alive
+=ERROR REPORT====
+MONITOR:erlang '*' [bad,bad] 
+MONITOR STARTED
+oops
+
+>retC:request(<0.151.0>,fun lists:min/1,3).
+WORKER: <0.151.0> alive
+MONITOR: <0.151.0> is dead i created <0.152.0> 
+WORKER: <0.152.0> alive
+=ERROR REPORT==== 
+MONITOR:  process <0.151.0> is dead because of lists:min(3) 
+MONITOR STARTED
+oops
+
+>retC:request(<0.151.0>,fun(E)->  erlang:'+'(E,E) end,[1,2]).
+WORKER: <0.151.0> alive
+MONITOR: <0.151.0> is dead i created <0.152.0> 
+WORKER: <0.152.0> alive
+=ERROR REPORT==== 
+MONITOR: process <0.151.0> is dead because of  erlang:'+'([1,2],[1,2]) 
+MONITOR STARTED
+oops

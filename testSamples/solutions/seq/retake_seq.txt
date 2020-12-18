@@ -1,0 +1,138 @@
+Retake, sequential
+ 
+
+Task no. 0:
+===========
+Make sure to use only your repl (the same as you shared before) and stay all the time in our call. 
+
+I will check the change file history, in case I suspect you did not write your solution.  So it is in your interest to do everything in repl and to not copy paste stuff.
+
+Create a new file called retS.erl, copy the following declaration form to your retS.erl file and fill in the required data:
+
+~~~~
+
+%% <Name>
+
+%% <Neptun ID>
+
+%% <DDS, RETAKE1>
+
+%% <02.11.2020.>
+
+%% This solution was submitted and prepared by <Name, Neptun ID> for the DDS Test Sequential.
+
+%% I declare that this solution is my own work.
+
+%% I have not copied or used third party solutions.
+
+%% I have not passed my solution to my classmates, neither  made it public.
+
+%% Students’ regulation of Eötvös Loránd University (ELTE Regulations Vol. II. 74/C. § ) states that as long as a student presents another student’s work - or at least the significant part of it - as his/her own performance, it will count as a disciplinary fault. The most serious consequence of a disciplinary fault can be dismissal of the student from the University.
+
+~~~
+
+Task no. 1: doubleZip 
+=================================
+Using only recursion or tail-recursion (no standard lib, no if no case), solve the following exercise:
+
+Make a doubleZip/2 function that takes two lists: Keys and Values. 
+
+For each Key store two consecutives values in this format: {Key, [Val1,Val2]}
+
+if there is no value left, the other keys are discarded
+if there is only one value left, it will store it as {Key,[Val]}
+if there is no key left all the values left will be stored under the key leftovers
+~~~
+
+doubleZip(list(),list()) -> proplist()
+
+~~~
+
+Test cases:
+
+>retS:dubleZip([a,b,c],[1,2,3,4,5])==[{a,[1,2]},{b,[3,4]},{c,[5]}].
+
+> retS:dubleZip([a,b],[1,2,3,4,5])==[{a,[1,2]},{b,[3,4]},{leftover,[5]}].
+
+>retS:dubleZip([a,b,c],[1,2,3,4])==[{a,[1,2]},{b,[3,4]}].
+
+>retS:dubleZip([],[1,2,3,4])==[{leftover,[1,2,3,4]}].
+
+> retS:dubleZip([],[])==[].
+Task no. 2: marginCut
+=================================
+You can use anything to solve this one:
+
+Write the function marginCut/3. The function takes a list to be cut into chunks L, the size of the chunks S, and M, the amount of elements  in the tail to repeat at the beginning of the next chunk .
+
+The function returns a list of lists. Each list will have size S (the last one may be smaller than S, we do not mind) .  M should be < S,  otherwise the function returns L.
+
+marginCut( [1,2,3,4,5],3,2)  will generate lists of size 3 with 2 elements as margin.
+
+The first list of 3 elements is [1,2,3],  taking two elements from it's  tail [2,3] this will be the start of the next segment [2,3,4]. For the next iteration its 2 element tail is [3,4], so the final solution will be : [[ 1,2,3],[  2,3,4 ],[3,4,5]]       
+
+HINTS: use lists:sublist(L,N) to get the first N elements of a list
+lists:subtract (or -- ) can remove the first occurrence of elements in a list from an other 
+~~~
+
+marginCut(list(),integer(),integer()) -> list(list())
+
+~~~
+
+Test cases:
+
+> retS:marginCut([1,2,3,4,5,6,7,8,9],3,2)==[[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7],[6,7,8],[7,8,9]].
+
+>retS:marginCut([1,2,3,4],2,2)==[1,2,3,4].
+
+>retS:marginCut([1,2,3,4],2,1)==[[1,2],[2,3],[3,4]].
+
+Task no. 3: funMultiplier
+=================================
+You can use anything to solve this one:
+
+Make the function funMultiplier/1, it takes a function F of arity one and returns a function G or arity 2.
+G applies F to all those elements E of a given list L that satisfy a certain condition C.
+
+HINT: If you do not want to implement recursion yourself you can use any combinations  of lists functions to handle elements recursively  (eg. foreach,map,foldl,filter,partition etc..)
+~~~
+
+funMultiplier(fun(element())) -> fun(list(element()),boolean_fun(element()))
+
+~~~
+
+Test cases:
+
+> G = retS:funMultiplier(fun lists:max/1).
+> G([[1,2,3,4],[4,5,7],[5,8,9,6]], fun(E)-> lists:min(E)>3 end) == [7,9].
+
+> G1 = retS:funMultiplier(fun erlang:length/1).                                           
+> G1([[14],[4,7],[5,6]], fun(E)->length(E)>0  end) == [1,2,2].
+Task no. 4: compareMaps
+=================================
+You can use anything to solve this one:
+
+Make a function compareMaps/2 that takes two maps and returns the distance D between them. D is a positive integer computed as follows:
+
+it is 0 if the Maps are identical
+it is incremented of 2 points for every Key that is present only in one of the Maps but not in the other 
+for every Key in both Maps, D is incremented of 1 point if their values are different
+HINTS: maps:keys(Map) return list of keys in a Map while maps:get(Key,Map) returns the Value for the Key
+~~~
+
+compareMaps(fmap(),map()) -> number()
+
+~~~
+
+Test cases:
+
+>retS:compareMaps(#{it=> ciao, en=>bye, hu=>szia}, #{it=>ciao, en=>hi})== 3.
+% hu is not in the second map +2, en is in both but with different values +1 
+
+>retS:compareMaps(#{en=>bye, hu=>szia}, #{it=>ciao, en=>hi})== 5.
+% hu not in both +2, it not in both +2, en with different values +1 
+
+>retS:compareMaps(#{it=> ciao, en=>bye, hu=>szia}, #{})==6.
+% no key in the second map 3 keys * +2 
+
+>retS:compareMaps(#{it=> ciao}, #{it=>ciao})==0. 

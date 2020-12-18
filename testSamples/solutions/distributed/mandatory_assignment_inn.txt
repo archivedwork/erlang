@@ -1,0 +1,81 @@
+Distributed - mandatory assignment
+In this exercise we are going to implement a distributed erlang solution. It should be able to run on three or more separate erlang VMs or on different computers on the same network. 
+
+Each step of the solution should be accompanied by screenshots of 3 shells running (2 travelers and one inn ) and their output. 
+
+This is not a team assignment, group solutions/similar solutions will not be accepted! You should be able to explain and defend your own solution.
+
+Inn Adventure 
+
+
+Deep in the woods there is only one inn with one bed in it: create a node called inn and run the goblins there.
+
+create_goblins/0
+There are N goblins at the door of the inn (create_goblins(N) spawn 0<N<10 goblin processes and globally register them).
+
+traveler/0
+You will run multiple distributed travelers (have 2 or more erlang nodes to call traveler/0). When a traveler arrives at the inn ( traveler spawns inn_adventure/0)
+
+inn_adventure/0
+asks all the goblins (use global:registered_names() to retrieve them)  if they let him pass to get to the inn bed ({use_bed,TravelerId}) .
+
+if half plus one DINSTINCT goblins allows it ({granted, GoblinId}) traveler can pass (traveler needs N/2+1 grants with N= amount of currently registered Goblins)
+if he succeed he removes from the message box all the other messages from other goblins
+then he tells all the goblin he will sleep ({on_bed,TravelerId})
+he will Nap for 1 to 5 seconds (rand:uniform/1)
+finally he will tell ALL the goblins he is leaving ({leaving_bed,TravelerId})
+otherwise, (N/2+1 goblin {grunted, GoblinId}), he will wait 3 seconds and try again
+goblin/1
+Each Goblins sees the Bed (initialize them with the atom Bed= free),
+If he get a request to pass ({use_bed,TravelerId}) he will decide whether to let the traveler go (handlebed/3 ).
+
+When a goblin sees a traveler getting on the bed ({on_bed,TravelerId}) it will refresh is knowledge of Bed with the TravelId.
+When a goblin sees the traveler leaving ({leaving_bed,TravelerId}) and the traveler is the one that was in the Bed,  he will now consider the Bed again free.
+
+handlebed/3
+Takes TravelerId, Bed and a Dice roll result. Goblins are fickle creatures:
+
+There is 1 chance out of 6 that even if the bed is free they will grunt in denial and not allow the traveler to pass
+With a chance 5/6, if the bed is free, they will save the traveler Pid in the Bed and garant the pass
+If they know there is already a traveler sleeping inside (Bed is not free but a different Pid), they will grunt
+
+
+Grade +1
+traveler/1
+Modify the traveler so that after sleeping he will travel (wait for 3 seconds) and then he will start again his inn_adventure (make traveler/1 recursive) .
+
+inn_adventure/1
+Traveler should start inn_adventure with a bag of Patience (set to 5):
+
+every time he does not get to sleep his Patience should be decremented of one,
+every time he sleep his Patience will increase of 2
+if a traveler with 0 patience does not get goblins approval to sleep he will react by killing all goblins with a death_spell
+this should also terminate the game for all travelers (If there are no Goblins the travelers will terminate with state this_inn_is_boring)
+ 
+
+Grade +1
+Have a sentinel/0 monitor each Goblin, if a goblin dies, wait for 2 seconds and call a new one! Modify the inn_adventure/1 so that the traveler kills all goblins minus one.
+
+sentinel/0
+Starts together with the Goblins (it handles monitor, new spawns and registers ).
+
+game_over/0
+Make a function game_over() that kills the sentinel and all the goblins to terminate the adventure.
+
+ 
+
+Grade +1
+Modify the solution to have M available Beds, goblins should always consider the beds in the same order so that if a Bed is assigned Goblins will all know it is the first one free from the left.
+
+E.g. after a new granted bed Beds= [ TPid,T1Pid,T2Pid , free, T4Pid, free]  would become
+Beds= [ TPid,T1Pid,T2Pid , T3Pid, T4Pid, free] 
+To keep track of who is freeing what bed, whenever a traveler gets a bed he should know a unique reference to it and use it to  on_bed and to leave_bed.  Travelers should not be able to guess this reference! Every time a bed is free the goblins should update the reference.  Modify the traveler leave_bed to select only one goblin to communicate to, modify goblin to create the new Ref and spread the Ref update to other goblins.
+
+E.g. init of 3 Beds would be [ {free, URef}, {free, U1Ref}, {free, U2Ref}]  
+When T1 get a bed he will send an on_bed and get the URef : [ {T1pid, URef}, {free, U1Ref}, {free, U2Ref}] . 
+When he sends to one random goblin in the registered ones leave_bed the goblin will spread the info of him leaving and the new ref, so that everyone will know:
+
+[ {free, NEWURef}, {free, U1Ref}, {free, U2Ref}]  
+ 
+
+ 

@@ -1,0 +1,13 @@
+   %GoblinsList = global:registered_names(),
+    % GoblinID ==  index of distinct if Distinct = 3 then bring goblin id in index 3 then get the id
+    
+     %Goblin = lists:nth(DINSTINCT, GoblinsList),
+    % GoblinId = global:whereis_name(Goblin),
+    % global:register_name(gid, GoblinId), % already registered no need for register again
+    % io:format("global registered goblins are ~p~nlength of them are ~p~nDistinct is ~p~nthe Goblin is ~p~nGoblinId is ~p~n", [global:registered_names(), N, DINSTINCT, Goblin, GoblinId]),
+    % send allow message to goblin and usse_bed
+
+    % Goblin = lists:nth(DINSTINCT, GoblinsList),
+    % GoblinId = global:whereis_name(Goblin),
+
+    % global:send(Goblin, Message).
